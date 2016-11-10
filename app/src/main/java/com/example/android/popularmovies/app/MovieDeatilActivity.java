@@ -13,7 +13,7 @@ public class MovieDeatilActivity  extends ActionBarActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MovieDeatilFragment())
+                    .add(R.id.container, new MovieDetailFragment())
                     .commit();
         }
     }
