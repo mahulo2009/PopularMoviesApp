@@ -3,15 +3,14 @@
     android:layout_height="match_parent"
     android:layout_alignParentBottom="true"
     android:layout_alignRight="@+id/textView"
-    android:layout_alignEnd="@+id/textView"
-    android:layout_marginBottom="61dp">
+    android:layout_alignEnd="@+id/textView">
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/gridview_movies"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:stretchMode="columnWidth"
-        android:numColumns="2"
+        android:numColumns="@integer/grid_view_num_columns"
         />
+
 </FrameLayout>
 

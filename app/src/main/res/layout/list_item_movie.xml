@@ -6,5 +6,6 @@
     android:adjustViewBounds="true"
     />
 
-
-
+<!--
+    android:adjustViewBounds="true"
+-->
