@@ -1,13 +1,16 @@
 package com.example.android.popularmovies.app;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  *
  *
  * Created by mhuertas on 9/11/16.
  */
-public class Movie {
+public class Movie implements Parcelable {
 
-    private int id;
+
     private String title;
     private String poster_path;
     private String overview;
@@ -15,14 +18,6 @@ public class Movie {
     private String release_date;
 
     public Movie() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -66,6 +61,41 @@ public class Movie {
     }
 
     public String toString() {
-        return id + " : " + title + " - " + poster_path + " - " + vote_average + " -  " + release_date ;
+        return  title + " - " + poster_path + " - " + vote_average + " -  " + release_date ;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(poster_path);
+        dest.writeString(overview);
+        dest.writeString(vote_average);
+        dest.writeString(release_date);
+    }
+
+    protected Movie(Parcel in) {
+        title = in.readString();
+        poster_path = in.readString();
+        overview = in.readString();
+        vote_average = in.readString();
+        release_date = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
 }

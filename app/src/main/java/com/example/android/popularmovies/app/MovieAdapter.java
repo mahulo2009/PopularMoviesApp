@@ -3,7 +3,6 @@ package com.example.android.popularmovies.app;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +53,6 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
 
-        Log.v(LOG_TAG, "getView: " + position + " " + convertView);
 
         //Check if there is a View to be recycled rather than creating a new one.
         if (convertView==null) {

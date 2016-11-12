@@ -1,6 +1,8 @@
 package com.example.android.popularmovies.app;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +38,9 @@ import java.util.ArrayList;
  * Fragment to present a grid arrangement of movies posters
  */
 public class MainFragment extends Fragment {
+
+    private final String LOG_TAG = MainFragment.class.getSimpleName();
+
     /**
      * The movies array adapter
      */
@@ -89,11 +95,14 @@ public class MainFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = mMovieAdapter.getItem(position);
+
                 Intent detailIntent = new Intent(getActivity(),MovieDeatilActivity.class);
-                detailIntent.putExtra(Intent.EXTRA_TEXT,Integer.toString(movie.getId())); //TODO TEXT OF INTEGER
+                detailIntent.putExtra("MOVIE",movie);
                 startActivity(detailIntent);
+
             }
         });
+
 
         return rootView;
     }
@@ -104,11 +113,29 @@ public class MainFragment extends Fragment {
         updateMovies();
     }
 
-
     public void updateMovies() {
-        FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
-        fetchMoviesTask.execute();
+        if (isOnline()) {
+            FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
+            fetchMoviesTask.execute();
+        } else  {
+            Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
+            Log.d(LOG_TAG,"NOT internet connectivity for the moment");
+        }
     }
+
+    /**
+     * Checks the device is connected to Internet.
+     *
+     * @return
+     */
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null &&
+                cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
 
     /**
      * Async task to query the API in the background to obtain a list of movies. In the UI thread
@@ -119,7 +146,13 @@ public class MainFragment extends Fragment {
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
 
-        //TODO REVIEW THIS.
+        /**
+         * Build the complete image from the relative path.
+         *
+         * @param poster_path   relative image path
+         *
+         * @return              The complete image path
+         */
         private String getImagePath(String poster_path)  {
 
             URI uri = null;
@@ -133,14 +166,25 @@ public class MainFragment extends Fragment {
 
         }
 
+        /**
+         * Build a list of Movie objects from the JSON string from the API request.
+         *
+         * @param movieJsonStr      JSON string from the API request.
+         *
+         * @return                  List of movie objects
+         *
+         * @throws JSONException    Exception JSON parsing
+         */
         private Movie[] getMoviesDataFromJson(String movieJsonStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
-            final String MV_LIST = "results";
-            final String MV_ID = "id";
-            final String MV_POSTER_PATH = "poster_path";
             final String MV_TITLE = "original_title";
+            final String MV_POSTER_PATH = "poster_path";
+            final String MV_OVERVIEW = "overview";
+            final String MV_VOTE_AVERAGE = "vote_average";
+            final String MV_RELEASE_DATE = "release_date";
+            final String MV_LIST = "results";
 
             //Parse the JSON result and get the movie list
             JSONObject moviesJson = new JSONObject(movieJsonStr);
@@ -149,23 +193,16 @@ public class MainFragment extends Fragment {
             //Store the result into an array.
             Movie[] results = new Movie[moviesArray.length()];
             for(int i = 0; i < moviesArray.length(); i++) {
-
-                int id;
-                String poster_path;
-                String title;
-
                 // Get the JSON object representing a movie
                 JSONObject movieJson = moviesArray.getJSONObject(i);
 
-                id = movieJson.getInt(MV_ID);
-                poster_path = movieJson.getString(MV_POSTER_PATH);
-                title = movieJson.getString(MV_TITLE);
-
                 //Build the movie entry string
                 Movie movie = new Movie();
-                movie.setId(id);
-                movie.setTitle(title);
-                movie.setPoster_path(getImagePath(poster_path));
+                movie.setTitle(movieJson.getString(MV_TITLE));
+                movie.setPoster_path(getImagePath(movieJson.getString(MV_POSTER_PATH)));
+                movie.setOverview(movieJson.getString(MV_OVERVIEW));
+                movie.setVote_average(movieJson.getString(MV_VOTE_AVERAGE));
+                movie.setRelease_date(movieJson.getString(MV_RELEASE_DATE));
 
                 results[i] = movie;
             }
@@ -176,6 +213,11 @@ public class MainFragment extends Fragment {
             return results;
         }
 
+        /**
+         * Get from the preferences the order by criteria
+         *
+         * @return
+         */
         private String getOrderBy() {
             String orderStr = PreferenceManager.getDefaultSharedPreferences(getActivity()).
                     getString(getString(R.string.pref_sort_order_key),
@@ -279,5 +321,4 @@ public class MainFragment extends Fragment {
             }
         }
     }
-
 }
