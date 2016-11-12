@@ -1,9 +1,10 @@
 package com.example.android.popularmovies.app;
 
 /**
+ *
+ *
  * Created by mhuertas on 9/11/16.
  */
-
 public class Movie {
 
     private int id;

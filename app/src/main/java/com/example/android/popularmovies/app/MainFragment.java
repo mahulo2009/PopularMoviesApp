@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.GridView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -73,19 +75,17 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         //Creates the array update, empty.
-        mMovieAdapter = new ArrayAdapter<Movie>(getActivity(),
-                R.layout.list_item_movie,
-                R.id.list_item_movie_textview,
-                new ArrayList<Movie>());
+        mMovieAdapter = new MovieAdapter(getActivity(),
+                                            new ArrayList<Movie>());
 
         //Inflate the fragment.
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Create a list view to present the list of movies
-        ListView listView = (ListView)rootView.findViewById(R.id.listview_movies);
-        listView.setAdapter(mMovieAdapter);
+        GridView gridView = (GridView)rootView.findViewById(R.id.gridview_movies);
+        gridView.setAdapter(mMovieAdapter);
         //If the user tap a movie entry, a detail view is showed
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = mMovieAdapter.getItem(position);
@@ -119,6 +119,20 @@ public class MainFragment extends Fragment {
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
 
+        //TODO REVIEW THIS.
+        private String getImagePath(String poster_path)  {
+
+            URI uri = null;
+            try {
+                uri = new URI("http","image.tmdb.org","/t/p/w185" + poster_path,null);
+            } catch (URISyntaxException e) {
+                return "";
+            }
+            return uri.toString();
+
+
+        }
+
         private Movie[] getMoviesDataFromJson(String movieJsonStr)
                 throws JSONException {
 
@@ -151,7 +165,7 @@ public class MainFragment extends Fragment {
                 Movie movie = new Movie();
                 movie.setId(id);
                 movie.setTitle(title);
-                movie.setPoster_path(poster_path);
+                movie.setPoster_path(getImagePath(poster_path));
 
                 results[i] = movie;
             }
