@@ -18,6 +18,17 @@ import com.squareup.picasso.Picasso;
  */
 public class MovieDetailFragment extends Fragment {
 
+    public static String MOVIE_KEY="MOVIE";
+
+
+    //The GUI elements
+    private TextView mTitleTextView;
+    private TextView mReleaseDateTextView;
+    private TextView mRatingTextView;
+    private TextView mOverViewTextView;
+    private ImageView mImageView;
+
+
     public MovieDetailFragment() {
     }
 
@@ -37,31 +48,32 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_deatil, container, false);
 
-
-
         Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra("MOVIE")) {
-            Movie movie = (Movie)intent.getParcelableExtra("MOVIE");
+        if (intent != null && intent.hasExtra(MOVIE_KEY)) {
+            Movie movie = (Movie)intent.getParcelableExtra(MOVIE_KEY);
 
 
-            TextView titleTextView = (TextView)rootView.findViewById(R.id.movie_title_textview);
-            titleTextView.setText(movie.getTitle());
+            mTitleTextView = (TextView)rootView.findViewById(R.id.movie_title_textview);
+            mTitleTextView.setText(movie.getTitle());
 
-            TextView releaseDateTextView = (TextView)rootView.findViewById(R.id.movie_releasedate_textview);
-            releaseDateTextView.setText(extractYear(movie.getRelease_date()));
+            mReleaseDateTextView = (TextView)rootView.findViewById(R.id.movie_releasedate_textview);
+            mReleaseDateTextView.setText(extractYear(movie.getRelease_date()));
 
-            TextView ratingTextView = (TextView)rootView.findViewById(R.id.movie_user_rating_textview);
-            ratingTextView.setText(appendRating(movie.getVote_average()));
+            mRatingTextView = (TextView)rootView.findViewById(R.id.movie_user_rating_textview);
+            mRatingTextView.setText(appendRating(movie.getVote_average()));
 
-            TextView overViewTextView = (TextView)rootView.findViewById(R.id.movie_user_overview_textview);
-            overViewTextView.setText(movie.getOverview());
+            mOverViewTextView = (TextView)rootView.findViewById(R.id.movie_user_overview_textview);
+            mOverViewTextView.setText(movie.getOverview());
 
-            ImageView imgageView = (ImageView)rootView.findViewById(R.id.movie_poster_imageview);
-            Picasso.with(getContext()).load(movie.getPoster_path()).into(imgageView);
+            mImageView = (ImageView)rootView.findViewById(R.id.movie_poster_imageview);
+            Picasso.with(getContext()).load(movie.getPoster_path()).into(mImageView);
         }
 
         return rootView;
     }
+
+
+    //TODO IMPROVE THIS PART.
 
     /**
      * Extract the year string from the data

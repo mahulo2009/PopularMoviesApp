@@ -62,11 +62,9 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
 
             //ViewHolder pattern. The component views are stored inside the tag field of the Layout.
             //They can be access immediately without the need to look them up repeatedly.
-            viewHolder = new ViewHolder();
-            viewHolder.movie_poster = (ImageView)convertView.findViewById(R.id.movie_poster_imageview);
-            viewHolder.position=position;
-
+            viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
+
         } else {
             viewHolder =(ViewHolder)convertView.getTag();
         }
@@ -86,6 +84,10 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
      */
     public static class ViewHolder  {
         public ImageView movie_poster;
-        public int position;
+
+        public ViewHolder(View view) {
+
+            movie_poster = (ImageView)view.findViewById(R.id.movie_poster_imageview);
+        }
     }
 }
