@@ -7,15 +7,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.popularmovies.app.data.Movie;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -27,18 +25,41 @@ import java.net.URL;
 public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
 
     private Context mContext;
-
     private ArrayAdapter<Movie> mMovieAdapter;
-
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
-
-
 
     public FetchMoviesTask(Context Context,ArrayAdapter<Movie> movieAdapter) {
         this.mContext=Context;
         this.mMovieAdapter=movieAdapter;
     }
 
+    @Override
+    protected Movie[] doInBackground(Void... params) {
+        Uri builtUri = buildUri();
+        Log.v(LOG_TAG, "Movies URL: " + builtUri.toString());
+
+        try {
+            URL url = new URL(builtUri.toString());
+            return parseResponce(Utility.request(url));
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Movie[] result) {
+        super.onPostExecute(result);
+
+        if (result != null) {
+            mMovieAdapter.clear();
+            for (Movie m : result) {
+                mMovieAdapter.add(m);
+            }
+        }
+    }
 
     /**
      * Build the complete image from the relative path.
@@ -48,7 +69,6 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
      * @return              The complete image path
      */
     private String getImagePath(String poster_path)  {
-
         URI uri = null;
         try {
             uri = new URI("http","image.tmdb.org","/t/p/w185" + poster_path,null);
@@ -56,8 +76,33 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
             return "";
         }
         return uri.toString();
+    }
 
+    /**
+     * Get from the preferences the order by criteria
+     *
+     * @return
+     */
+    private String getOrderBy() {
+        String orderStr = PreferenceManager.getDefaultSharedPreferences(mContext).
+                getString(mContext.getString(R.string.pref_sort_order_key),
+                        mContext.getString(R.string.pref_most_popular_order));
+        return orderStr;
+    }
 
+    private Uri buildUri() {
+        // Construct the URL
+        final String APPID_PARAM = "api_key";
+
+        Uri.Builder builder = new Uri.Builder();
+        Uri builtUri = builder.scheme("http")
+                .authority("api.themoviedb.org")
+                .appendPath("3")
+                .appendPath("movie")
+                .appendPath(getOrderBy())
+                .appendQueryParameter(APPID_PARAM,BuildConfig.THE_MOVIE_DB_API_KEY)
+                .build();
+        return builtUri;
     }
 
     /**
@@ -69,10 +114,10 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
      *
      * @throws JSONException    Exception JSON parsing
      */
-    private Movie[] getMoviesDataFromJson(String movieJsonStr)
+    private Movie[] parseResponce(String movieJsonStr)
             throws JSONException {
-
         // These are the names of the JSON objects that need to be extracted.
+        final String MV_ID = "id";
         final String MV_TITLE = "original_title";
         final String MV_POSTER_PATH = "poster_path";
         final String MV_OVERVIEW = "overview";
@@ -92,6 +137,7 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
 
             //Build the movie entry string
             Movie movie = new Movie();
+            movie.setId(movieJson.getString(MV_ID));
             movie.setTitle(movieJson.getString(MV_TITLE));
             movie.setPoster_path(getImagePath(movieJson.getString(MV_POSTER_PATH)));
             movie.setOverview(movieJson.getString(MV_OVERVIEW));
@@ -107,111 +153,4 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
         return results;
     }
 
-    /**
-     * Get from the preferences the order by criteria
-     *
-     * @return
-     */
-    private String getOrderBy() {
-        String orderStr = PreferenceManager.getDefaultSharedPreferences(mContext).
-                getString(mContext.getString(R.string.pref_sort_order_key),
-                        mContext.getString(R.string.pref_most_popular_order));
-
-        return orderStr;
-    }
-
-    @Override
-    protected Movie[] doInBackground(Void... params) {
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        // Will contain the raw JSON response as a string.
-        String moviesJsonStr = null;
-
-        try {
-            // Construct the URL
-            final String APPID_PARAM = "api_key";
-
-            Uri.Builder builder = new Uri.Builder();
-            Uri builtUri = builder.scheme("http")
-                    .authority("api.themoviedb.org")
-                    .appendPath("3")
-                    .appendPath("movie")
-                    .appendPath(getOrderBy())
-                    .appendQueryParameter(APPID_PARAM,BuildConfig.THE_MOVIE_DB_API_KEY)
-                    .build();
-
-            Log.v(LOG_TAG, "Movies URL: " + builtUri.toString());
-            URL url = new URL(builtUri.toString());
-
-            // Create the request to Themoviedb, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
-            moviesJsonStr = buffer.toString();
-
-            Log.v(LOG_TAG, "Movie JSON String: " + moviesJsonStr);
-
-            try {
-                return getMoviesDataFromJson(moviesJsonStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Error ", e);
-            }
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the movie data, there's no point in attemping
-            // to parse it.
-            return null;
-        } finally{
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Movie[] result) {
-        super.onPostExecute(result);
-
-        if (result != null) {
-            mMovieAdapter.clear();
-            for (Movie m : result) {
-                mMovieAdapter.add(m);
-            }
-        }
-    }
 }

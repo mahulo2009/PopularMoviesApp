@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 /**
  * The main activity presents a grid arrangement of movies posters. The user can change
- * the sort order, settings menu, by most popular, o by rate.
+ * the sort order, settings menu, by most popular or by rate.
  *
  * A detail screen is showed, with additional information, when the user tap on a movie.
  */

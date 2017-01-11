@@ -1,7 +1,9 @@
-package com.example.android.popularmovies.app;
+package com.example.android.popularmovies.app.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.util.List;
 
 /**
  *
@@ -10,14 +12,32 @@ import android.os.Parcelable;
  */
 public class Movie implements Parcelable {
 
-
+    private String id;
     private String title;
     private String poster_path;
     private String overview;
     private String vote_average;
     private String release_date;
 
+    /**
+     * The Trailers for a movie. It is loaded LAZY.
+     */
+    private List<Trailer> trailers;
+
+    /**
+     * The Review for a movie. It is loaded LAZY.
+     */
+    private List<Review> reviews;
+
     public Movie() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -60,6 +80,22 @@ public class Movie implements Parcelable {
         this.release_date = release_date;
     }
 
+    public List<Trailer> getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(List<Trailer> trailers) {
+        this.trailers = trailers;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     public String toString() {
         return  title + " - " + poster_path + " - " + vote_average + " -  " + release_date ;
     }
@@ -71,6 +107,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(title);
         dest.writeString(poster_path);
         dest.writeString(overview);
@@ -79,6 +116,7 @@ public class Movie implements Parcelable {
     }
 
     protected Movie(Parcel in) {
+        id=in.readString();
         title = in.readString();
         poster_path = in.readString();
         overview = in.readString();

@@ -1,8 +1,6 @@
 package com.example.android.popularmovies.app;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,9 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.example.android.popularmovies.app.data.Movie;
 
 import java.util.ArrayList;
 
@@ -25,11 +24,10 @@ import java.util.ArrayList;
 public class MainFragment extends Fragment {
 
     private final String LOG_TAG = MainFragment.class.getSimpleName();
-
     /**
      * The movies array adapter
      */
-    private ArrayAdapter<Movie> mMovieAdapter;
+    private MovieAdapter mMovieAdapter;
 
     public MainFragment() {
     }
@@ -57,18 +55,15 @@ public class MainFragment extends Fragment {
             updateMovies();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         //Creates the array update, empty.
         mMovieAdapter = new MovieAdapter(getActivity(),
                                             new ArrayList<Movie>());
-
         //Inflate the fragment.
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -87,8 +82,6 @@ public class MainFragment extends Fragment {
 
             }
         });
-
-
         return rootView;
     }
 
@@ -98,27 +91,17 @@ public class MainFragment extends Fragment {
         updateMovies();
     }
 
+    /**
+     * Fetch the movie data from API movie service.
+     */
     public void updateMovies() {
-        if (isOnline()) {
+        if (Utility.isOnline(getActivity())) {
             FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(getContext(),mMovieAdapter);
             fetchMoviesTask.execute();
         } else  {
             Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG,"NOT internet connectivity for the moment");
         }
-    }
-
-    /**
-     * Checks the device is connected to Internet.
-     *
-     * @return
-     */
-    public boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return cm.getActiveNetworkInfo() != null &&
-                cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
 }

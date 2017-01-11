@@ -4,13 +4,16 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 
+/**
+ * The detail activity shows additional information, when the user tap on a movie.
+ */
 public class MovieDeatilActivity  extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_deatil);
-
+        //Startup the detail fragment.
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new MovieDetailFragment())

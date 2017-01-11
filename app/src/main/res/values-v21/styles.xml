@@ -6,4 +6,33 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+
+    <style name="CardViewBaseStyle" parent="CardView">
+        <item name="cardCornerRadius">4dp</item>
+        <item name="cardElevation">1sp</item>
+        <item name="cardBackgroundColor">@color/cardview_light_background</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+
+
+    <style name="CardViewStyle" parent="CardViewBaseStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="CardViewTextStyle">
+        <item name="android:padding">@dimen/movie_overview_padding</item>
+        <item name="android:textSize">@dimen/movie_overview_text_size</item>
+    </style>
+
+    <style name="Widget.CardContent" parent="android:Widget">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
 </resources>
+
