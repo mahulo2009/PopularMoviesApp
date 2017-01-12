@@ -16,11 +16,10 @@ import android.widget.Toast;
 import com.example.android.popularmovies.app.data.Movie;
 import com.squareup.picasso.Picasso;
 
-
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment implements  FetchTrailerTask.Callback {
 
     private final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
     /**
@@ -31,6 +30,8 @@ public class MovieDetailFragment extends Fragment {
      * The movie actually represented
      */
     private Movie mMovie;
+
+    private boolean mExtraDataInserted;
 
     //The GUI elements
     private TextView mTitleTextView;
@@ -78,13 +79,19 @@ public class MovieDetailFragment extends Fragment {
             mImageView = (ImageView)rootView.findViewById(R.id.movie_poster_imageview);
             Picasso.with(getContext()).load(mMovie.getPoster_path()).into(mImageView);
         }
+
+        mExtraDataInserted = false;
+
         return rootView;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        updateReviews();
+
+        if (!mExtraDataInserted) {
+            updateTrailers();
+        }
     }
 
     /**
@@ -106,12 +113,17 @@ public class MovieDetailFragment extends Fragment {
 
     private void updateTrailers() {
         if (Utility.isOnline(getActivity())) {
-            FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getView().getRootView());
-            fetchTrailerTask.execute();
+            FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext(),getView().getRootView(),this);
+            fetchTrailerTask.execute(mMovie.getId());
         } else  {
             Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG,"NOT internet connectivity for the moment");
         }
     }
 
+    @Override
+    public void onTrailerInserted() {
+        updateReviews();
+        mExtraDataInserted=true;
+    }
 }

@@ -2,8 +2,10 @@ package com.example.android.popularmovies.app;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -21,6 +23,8 @@ public class Utility {
 
     private static final String LOG_TAG = FetchReviewTask.class.getSimpleName();
 
+
+
     /**
      * Checks the device is connected to Internet.
      *
@@ -34,6 +38,12 @@ public class Utility {
                 cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
+    public static int dpToPx(Context context,int dp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+
     public static String getFirstNStrings(String str, int n) {
         String[] sArr = str.split(" ");
         String firstStrs = "";
@@ -42,10 +52,14 @@ public class Utility {
         return firstStrs.trim();
     }
 
-    public static Spanned buildUrl(String str) {
+    public static Spanned buildUrlReadMore(String str) {
         //TODO String in other file
         String result = "<html><a href="+str+">Read More...</a></html>";
         return Html.fromHtml(result);
+    }
+
+    public static Uri buildUriTrailer(String key) {
+        return Uri.parse("http://www.youtube.com/watch?v=" + key);
     }
 
     /**
@@ -61,6 +75,11 @@ public class Utility {
             return tokens[0];
         }
         return "";
+    }
+
+    public static String buildImageFirstFotogram(String url) {
+        String result = "http://img.youtube.com/vi/"+url+"/0.jpg";
+        return result;
     }
 
     /**

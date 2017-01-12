@@ -33,6 +33,7 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
     private Context mContext;
     private View mView;
 
+
     public FetchReviewTask(Context context,View view) {
         this.mContext=context;
         this.mView=view;
@@ -64,9 +65,9 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         super.onPostExecute(result);
 
         if (result != null) {
+            LinearLayout layout = (LinearLayout)mView.findViewById(R.id.moview_linear_layout);
             for (Review review: result) {
                 //Add Card View
-                LinearLayout layout = (LinearLayout)mView.findViewById(R.id.moview_linear_layout);
                 layout.addView(buildReviewCard(review));
             }
         }
@@ -102,7 +103,7 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         tv_url.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
         ));
-        tv_url.setText(Utility.buildUrl(review.getUrl()));
+        tv_url.setText(Utility.buildUrlReadMore(review.getUrl()));
         tv_url.setMovementMethod(LinkMovementMethod.getInstance());
 
         cardInner.addView(tv_title);
