@@ -1,18 +1,24 @@
 package com.example.android.popularmovies.app;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
 
 /**
- * The main activity presents a grid arrangement of movies posters. The user can change
- * the sort order, settings menu, by most popular or by rate.
+ * The main activity presents a grid arrangement of movies posters.
+ *
+ * There are three tabs to see the movie with the following criterias:
+ * - Top Rated: As rated from the API movie service
+ * - Most Popular: Idem.
+ * - Favourites: To show movies marked for the user as favourites. These movies are
+ * stored locally.
  *
  * A detail screen is showed, with additional information, when the user tap on a movie.
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,30 +26,15 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         //Creates the main fragment with the grid arrangement of movies posters
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MainFragment())
-                    .commit();
-        }
-    }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view);
+        setSupportActionBar(toolbar);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //Inflate the main menu
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+        MoviewViewPagerAdapter adapter = new MoviewViewPagerAdapter(getSupportFragmentManager(),getBaseContext());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(adapter);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //Actions on user press the menu items
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this,SettingsActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
 }

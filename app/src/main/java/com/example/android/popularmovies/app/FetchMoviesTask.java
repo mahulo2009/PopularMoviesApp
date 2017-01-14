@@ -3,7 +3,6 @@ package com.example.android.popularmovies.app;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -22,20 +21,27 @@ import java.net.URL;
  * Async task to query the API in the background to obtain a list of movies. In the UI thread
  * the Array Adapter is updated.
  */
-public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
+public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
 
+    private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
     private Context mContext;
     private ArrayAdapter<Movie> mMovieAdapter;
-    private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
     public FetchMoviesTask(Context Context,ArrayAdapter<Movie> movieAdapter) {
         this.mContext=Context;
         this.mMovieAdapter=movieAdapter;
     }
 
+    /**
+     * Access the movie API in the background
+     *
+     * @param params    The query criteria: popular or top rated.
+     *
+     * @return          The List of movies
+     */
     @Override
-    protected Movie[] doInBackground(Void... params) {
-        Uri builtUri = buildUri();
+    protected Movie[] doInBackground(String... params) {
+        Uri builtUri = buildUri(params[0]);
         Log.v(LOG_TAG, "Movies URL: " + builtUri.toString());
 
         try {
@@ -78,19 +84,7 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
         return uri.toString();
     }
 
-    /**
-     * Get from the preferences the order by criteria
-     *
-     * @return
-     */
-    private String getOrderBy() {
-        String orderStr = PreferenceManager.getDefaultSharedPreferences(mContext).
-                getString(mContext.getString(R.string.pref_sort_order_key),
-                        mContext.getString(R.string.pref_most_popular_order));
-        return orderStr;
-    }
-
-    private Uri buildUri() {
+    private Uri buildUri(String orderBy) {
         // Construct the URL
         final String APPID_PARAM = "api_key";
 
@@ -99,7 +93,7 @@ public class FetchMoviesTask extends AsyncTask<Void,Void,Movie[]> {
                 .authority("api.themoviedb.org")
                 .appendPath("3")
                 .appendPath("movie")
-                .appendPath(getOrderBy())
+                .appendPath(orderBy)
                 .appendQueryParameter(APPID_PARAM,BuildConfig.THE_MOVIE_DB_API_KEY)
                 .build();
         return builtUri;

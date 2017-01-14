@@ -24,10 +24,13 @@ import java.util.ArrayList;
 public class MainFragment extends Fragment {
 
     private final String LOG_TAG = MainFragment.class.getSimpleName();
+
+    public static final String ORDER_BY_KEY = "ORDER_BY_KEY";
     /**
      * The movies array adapter
      */
     private MovieAdapter mMovieAdapter;
+    private String mOrderBy;
 
     public MainFragment() {
     }
@@ -37,6 +40,8 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //This makes the options menu available.
         setHasOptionsMenu(true);
+        //The order by criteria: top rated or popular movies.
+        mOrderBy= getArguments().getString(ORDER_BY_KEY);
     }
 
     @Override
@@ -97,7 +102,7 @@ public class MainFragment extends Fragment {
     public void updateMovies() {
         if (Utility.isOnline(getActivity())) {
             FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(getContext(),mMovieAdapter);
-            fetchMoviesTask.execute();
+            fetchMoviesTask.execute(mOrderBy);
         } else  {
             Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG,"NOT internet connectivity for the moment");
