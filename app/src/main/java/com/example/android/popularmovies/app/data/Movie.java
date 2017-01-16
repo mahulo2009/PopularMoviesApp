@@ -18,6 +18,7 @@ public class Movie implements Parcelable {
     private String overview;
     private String vote_average;
     private String release_date;
+    private boolean favourite;
 
     /**
      * The Trailers for a movie. It is loaded LAZY.
@@ -94,6 +95,14 @@ public class Movie implements Parcelable {
 
     public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
     }
 
     public String toString() {

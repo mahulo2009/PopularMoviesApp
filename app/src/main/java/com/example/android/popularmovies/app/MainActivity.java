@@ -6,6 +6,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.facebook.stetho.Stetho;
+
 
 /**
  * The main activity presents a grid arrangement of movies posters.
@@ -23,13 +25,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Add Stetho debug.
+        //TODO REMOVE FOR PRODUCTION
+        Stetho.initializeWithDefaults(this);
+
         setContentView(R.layout.activity_main);
 
         //Creates the main fragment with the grid arrangement of movies posters
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view);
         setSupportActionBar(toolbar);
 
-        MoviewViewPagerAdapter adapter = new MoviewViewPagerAdapter(getSupportFragmentManager(),getBaseContext());
+        MovieViewPagerAdapter adapter = new MovieViewPagerAdapter(getSupportFragmentManager(),getBaseContext());
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
 

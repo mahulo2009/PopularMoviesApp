@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 /**
  * Created by mhuertas on 14/01/17.
  */
-public class MoviewViewPagerAdapter extends FragmentPagerAdapter {
+public class MovieViewPagerAdapter extends FragmentPagerAdapter {
 
     private Context mContext;
 
@@ -17,7 +17,7 @@ public class MoviewViewPagerAdapter extends FragmentPagerAdapter {
     private static final int RATED = 1;
     private static final int FAVOURITE = 2;
 
-    public MoviewViewPagerAdapter(FragmentManager fm,Context context) {
+    public MovieViewPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         mContext=context;
     }

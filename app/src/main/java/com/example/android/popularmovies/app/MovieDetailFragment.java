@@ -3,12 +3,14 @@ package com.example.android.popularmovies.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +41,7 @@ public class MovieDetailFragment extends Fragment implements  FetchTrailerTask.C
     private TextView mRatingTextView;
     private TextView mOverViewTextView;
     private ImageView mImageView;
+    private ImageButton mImageButton;
 
     public MovieDetailFragment() {
     }
@@ -78,11 +81,33 @@ public class MovieDetailFragment extends Fragment implements  FetchTrailerTask.C
 
             mImageView = (ImageView)rootView.findViewById(R.id.movie_poster_imageview);
             Picasso.with(getContext()).load(mMovie.getPoster_path()).into(mImageView);
-        }
 
+            mImageButton=(ImageButton)rootView.findViewById(R.id.favorite_button);
+            updateFavouriteButton();
+
+            mImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mMovie.isFavourite()) {
+                        mMovie.setFavourite(false);
+                    } else {
+                        mMovie.setFavourite(true);
+                    }
+                    updateFavouriteButton();
+                }
+            });
+        }
         mExtraDataInserted = false;
 
         return rootView;
+    }
+
+    private void updateFavouriteButton() {
+        if (mMovie.isFavourite()) {
+            mImageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.btn_star_big_on));
+        } else {
+            mImageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.btn_star_big_off));
+        }
     }
 
     @Override
