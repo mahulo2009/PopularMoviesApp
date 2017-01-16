@@ -80,7 +80,7 @@ public class TestDb {
     public void testReviewTable() {
 
         long movideRowId = insertMovie();
-        assertFalse("Error: Location Not Inserted Correctly", movideRowId == -1L);
+        assertFalse("Error: Review Not Inserted Correctly", movideRowId == -1L);
 
         SQLiteDatabase db = new MovieDbHelper(
                 InstrumentationRegistry.getTargetContext()).getWritableDatabase();

@@ -1,7 +1,9 @@
 package com.example.android.popularmovies.app;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
@@ -12,6 +14,8 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.example.android.popularmovies.app.data.MovieContract;
+import com.example.android.popularmovies.app.data.MovieDbHelper;
 import com.example.android.popularmovies.app.data.Trailer;
 import com.squareup.picasso.Picasso;
 
@@ -48,6 +52,8 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
         Log.v(LOG_TAG, "Reviews URL: " + builtUri.toString());
         try {
             URL url = new URL(builtUri.toString());
+            Trailer[] trailers = parseResponce(Utility.request(url));
+            insertDB(Integer.parseInt(params[0]),trailers);
             return parseResponce(Utility.request(url));
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
@@ -150,6 +156,19 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
             Log.v(LOG_TAG, "Trailer entry: " + s);
         }
         return results;
+    }
+
+    private void insertDB(Integer movieId,Trailer[] trailers) {
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+        for (Trailer trailer : trailers) {
+            ContentValues trailerValues = new ContentValues();
+            trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_KEY, trailer.getKey());
+            trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_NAME, trailer.getName());
+            trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_MOVIE_ID, movieId);
+            trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_ID, trailer.getId());
+            db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, trailerValues);
+        }
+        db.close();
     }
 
     public interface Callback {

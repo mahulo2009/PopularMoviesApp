@@ -1,6 +1,8 @@
 package com.example.android.popularmovies.app;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
@@ -12,6 +14,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.app.data.MovieContract;
+import com.example.android.popularmovies.app.data.MovieDbHelper;
 import com.example.android.popularmovies.app.data.Review;
 
 import org.json.JSONArray;
@@ -46,7 +50,9 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         Log.v(LOG_TAG, "Reviews URL: " + builtUri.toString());
         try {
             URL url = new URL(builtUri.toString());
-            return parseResponce(Utility.request(url));
+            Review[] reviews = parseResponce(Utility.request(url));
+            insertDB(Integer.parseInt(params[0]),reviews);
+            return reviews;
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (JSONException e) {
@@ -162,4 +168,19 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         return results;
     }
 
+    private void insertDB(Integer movieId,Review[] reviews) {
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+        for (Review review : reviews) {
+            ContentValues reviewValues = new ContentValues();
+
+            reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR, review.getAuthor());
+            reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_URL, review.getUrl());
+            reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, review.getContent());
+            reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, review.getId());
+            reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_MOVIE_ID, movieId);
+
+            db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, reviewValues);
+        }
+        db.close();
+    }
 }

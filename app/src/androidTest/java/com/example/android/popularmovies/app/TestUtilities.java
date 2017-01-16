@@ -39,10 +39,10 @@ public class TestUtilities {
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE, "1");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, "1952");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, "8");
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, 1);
 
         return movieValues;
     }
-
 
     public static ContentValues createReviewValues(long movideRowId) {
         ContentValues reviewValues = new ContentValues();
@@ -51,6 +51,7 @@ public class TestUtilities {
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, "Brillant");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_URL, "http://");
         reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_MOVIE_ID, movideRowId);
+        reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, 1);
 
         return reviewValues;
     }
@@ -61,6 +62,7 @@ public class TestUtilities {
         trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_KEY, "key");
         trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_NAME, "name");
         trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_MOVIE_ID, movideRowId);
+        trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_ID, 1);
 
         return trailerValues;
     }

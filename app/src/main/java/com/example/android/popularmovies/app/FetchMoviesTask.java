@@ -1,12 +1,16 @@
 package com.example.android.popularmovies.app;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.example.android.popularmovies.app.data.Movie;
+import com.example.android.popularmovies.app.data.MovieContract;
+import com.example.android.popularmovies.app.data.MovieDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +50,9 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
 
         try {
             URL url = new URL(builtUri.toString());
-            return parseResponce(Utility.request(url));
+            Movie[] movies = parseResponce(Utility.request(url));
+            insertDB(movies);
+            return movies;
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (JSONException e) {
@@ -145,6 +151,24 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
             Log.v(LOG_TAG, "Movie entry: " + s);
         }
         return results;
+    }
+
+    private void insertDB(Movie[] movies) {
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+        for (Movie movie : movies) {
+            ContentValues movieValues = new ContentValues();
+
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPoster_path());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE, movie.isFavourite());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getRelease_date());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVote_average());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getId());
+
+            db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movieValues);
+        }
+        db.close();
     }
 
 }
