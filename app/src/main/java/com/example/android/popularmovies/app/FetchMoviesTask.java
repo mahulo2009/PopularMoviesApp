@@ -2,15 +2,12 @@ package com.example.android.popularmovies.app;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.example.android.popularmovies.app.data.Movie;
 import com.example.android.popularmovies.app.data.MovieContract;
-import com.example.android.popularmovies.app.data.MovieDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,15 +22,21 @@ import java.net.URL;
  * Async task to query the API in the background to obtain a list of movies. In the UI thread
  * the Array Adapter is updated.
  */
-public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
+public class FetchMoviesTask extends AsyncTask<String,Void,Void> {
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
+    /**
+     *  Context to access resources.
+     */
     private Context mContext;
-    private ArrayAdapter<Movie> mMovieAdapter;
 
-    public FetchMoviesTask(Context Context,ArrayAdapter<Movie> movieAdapter) {
+    /**
+     * Constructor
+     *
+     * @param Context   Context to access resources.
+     */
+    public FetchMoviesTask(Context Context) {
         this.mContext=Context;
-        this.mMovieAdapter=movieAdapter;
     }
 
     /**
@@ -44,33 +47,23 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
      * @return          The List of movies
      */
     @Override
-    protected Movie[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         Uri builtUri = buildUri(params[0]);
         Log.v(LOG_TAG, "Movies URL: " + builtUri.toString());
 
         try {
+            //Build the URI for the API Movie service
             URL url = new URL(builtUri.toString());
+            //Parse the responce from json to java pojo.
             Movie[] movies = parseResponce(Utility.request(url));
-            insertDB(movies);
-            return movies;
+            //Insert into the database.
+            insertDB(movies,params[0]);
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage());
         }
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(Movie[] result) {
-        super.onPostExecute(result);
-
-        if (result != null) {
-            mMovieAdapter.clear();
-            for (Movie m : result) {
-                mMovieAdapter.add(m);
-            }
-        }
     }
 
     /**
@@ -90,6 +83,12 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
         return uri.toString();
     }
 
+    /**
+     * Build the URI to access the API movie service
+     *
+     * @param orderBy   Order by popular or top rated.
+     * @return
+     */
     private Uri buildUri(String orderBy) {
         // Construct the URL
         final String APPID_PARAM = "api_key";
@@ -153,8 +152,16 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
         return results;
     }
 
-    private void insertDB(Movie[] movies) {
-        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+    /**
+     * Insert into the database, table movie, the result.
+     *
+     * @param movies    The list of movies
+     * @param orderBy   The order criteria.
+     *
+     */
+    private void insertDB(Movie[] movies,String orderBy) {
+        ContentValues[] values = new ContentValues[movies.length];
+        int i=0;
         for (Movie movie : movies) {
             ContentValues movieValues = new ContentValues();
 
@@ -164,11 +171,12 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Movie[]> {
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE, movie.isFavourite());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getRelease_date());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVote_average());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA,orderBy );
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getId());
 
-            db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movieValues);
+            values[i++]=movieValues;
         }
-        db.close();
+        mContext.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI,values);
     }
 
 }

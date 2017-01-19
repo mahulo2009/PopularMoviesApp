@@ -2,22 +2,13 @@ package com.example.android.popularmovies.app;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.example.android.popularmovies.app.data.MovieContract;
-import com.example.android.popularmovies.app.data.MovieDbHelper;
 import com.example.android.popularmovies.app.data.Trailer;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,13 +17,10 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.example.android.popularmovies.app.Utility.buildImageFirstFotogram;
-import static com.example.android.popularmovies.app.Utility.buildUriTrailer;
-
 /**
  * Created by mhuertas on 7/01/17.
  */
-public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
+public class FetchTrailerTask extends AsyncTask<String,Void,Void> {
 
     private final String LOG_TAG = FetchTrailerTask.class.getSimpleName();
     private View mView;
@@ -46,7 +34,7 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
     }
 
     @Override
-    protected Trailer[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         Uri builtUri = buildUri(params[0]);
 
         Log.v(LOG_TAG, "Reviews URL: " + builtUri.toString());
@@ -54,7 +42,6 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
             URL url = new URL(builtUri.toString());
             Trailer[] trailers = parseResponce(Utility.request(url));
             insertDB(Integer.parseInt(params[0]),trailers);
-            return parseResponce(Utility.request(url));
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (JSONException e) {
@@ -64,56 +51,19 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
     }
 
     @Override
-    protected void onPostExecute(Trailer[] result) {
-        super.onPostExecute(result);
-        if (result != null) {
-            LinearLayout layout = (LinearLayout)mView.findViewById(R.id.moview_linear_layout);
-            //Add Card View
-            layout.addView(buildTrailerCard(result));
-        }
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
         mCallback.onTrailerInserted();
     }
 
-    private CardView buildTrailerCard(Trailer[] trailers) {
-
-        int margin = Utility.dpToPx(mContext,5);
-        int padding = margin;
-
-        CardView card = new CardView( new ContextThemeWrapper(mContext, R.style.CardViewStyle) , null, 0);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(margin, margin, margin, margin);
-        card.setLayoutParams(params);
-
-        HorizontalScrollView scrollView = new HorizontalScrollView(mContext);
-        LinearLayout cardInner = new LinearLayout(new ContextThemeWrapper(mContext, R.style.Widget_CardContent));
-        cardInner.setOrientation(LinearLayout.HORIZONTAL);
-
-        for (Trailer trailer : trailers)  {
-            ImageView iv_trailer = new ImageView(mContext);
-            iv_trailer.setTag(trailer.getKey());
-            iv_trailer.setPadding(padding ,padding ,padding ,padding );
-            iv_trailer.setOnClickListener(new View.OnClickListener() {
-                                              @Override
-                                              public void onClick(View v) {
-                                                  String key = (String) v.getTag();
-                                                  Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                                                         buildUriTrailer(key));
-                                                  webIntent.putExtra("force_fullscreen",true);
-                                                  mContext.startActivity(webIntent);
-                                              }
-                                          });
-            Picasso.with(mContext).load(buildImageFirstFotogram(trailer.getKey())).into(iv_trailer);
-            cardInner.addView(iv_trailer);
-        }
-        scrollView.addView(cardInner);
-        card.addView(scrollView);
-
-        return card;
-    }
-
+    /**
+    * Build the URI for the Movie service API call.
+    *
+    * @param ID    The ID for the movie to get the trailers from.
+    *
+    * @return      The URI.
+    */
     private Uri buildUri(String ID) {
         // Construct the URL
         final String APPID_PARAM = "api_key";
@@ -130,6 +80,14 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
         return builtUri;
     }
 
+    /**
+     * Parse the responce from the Movie API service.
+     *
+     * @param trailersJsonStr   The responce in JSON.
+     * @return                  A list of Trailer Objects.
+     *
+     * @throws JSONException    Error parsing the responce from serivce.
+     */
     private Trailer[] parseResponce(String trailersJsonStr) throws JSONException {
         // These are the names of the JSON objects that need to be extracted.
         final String TRAILER_ID = "id";
@@ -158,17 +116,24 @@ public class FetchTrailerTask extends AsyncTask<String,Void,Trailer[]> {
         return results;
     }
 
+    /**
+     * Insert the movies Trailer into the database using a content provider.
+     *
+     * @param movieId   The movie id for the trailer.
+     * @param trailers   A list of trailers
+     */
     private void insertDB(Integer movieId,Trailer[] trailers) {
-        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+        ContentValues[] values = new ContentValues[trailers.length];
+        int i=0;
         for (Trailer trailer : trailers) {
             ContentValues trailerValues = new ContentValues();
             trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_KEY, trailer.getKey());
             trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_NAME, trailer.getName());
             trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_MOVIE_ID, movieId);
             trailerValues.put(MovieContract.TrailerEntry.COLUMN_TRAILER_ID, trailer.getId());
-            db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, trailerValues);
+            values[i++]=trailerValues;
         }
-        db.close();
+        mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI,values);
     }
 
     public interface Callback {

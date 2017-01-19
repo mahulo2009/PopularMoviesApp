@@ -115,7 +115,7 @@ public class TestDb {
     public void testTrailerTable() {
 
         long movideRowId = insertMovie();
-        assertFalse("Error: Location Not Inserted Correctly", movideRowId == -1L);
+        assertFalse("Error: Trailer Not Inserted Correctly", movideRowId == -1L);
 
         SQLiteDatabase db = new MovieDbHelper(
                 InstrumentationRegistry.getTargetContext()).getWritableDatabase();

@@ -12,6 +12,10 @@ import java.util.List;
  */
 public class Movie implements Parcelable {
 
+    public static final String POPULAR_MOVIE = "popular";
+    public static final String TOP_RATED_MOVIE = "top_rated";
+    public static final String FAVOURITE_MOVIE = "favourite";
+
     private String id;
     private String title;
     private String poster_path;
@@ -19,6 +23,7 @@ public class Movie implements Parcelable {
     private String vote_average;
     private String release_date;
     private boolean favourite;
+    private String criteria;
 
     /**
      * The Trailers for a movie. It is loaded LAZY.
@@ -97,6 +102,14 @@ public class Movie implements Parcelable {
         this.reviews = reviews;
     }
 
+    public String getCriteria() {
+        return criteria;
+    }
+
+    public void setCriteria(String criteria) {
+        this.criteria = criteria;
+    }
+
     public boolean isFavourite() {
         return favourite;
     }
@@ -122,6 +135,8 @@ public class Movie implements Parcelable {
         dest.writeString(overview);
         dest.writeString(vote_average);
         dest.writeString(release_date);
+        dest.writeByte((byte) (favourite ? 1 : 0));
+        dest.writeString(criteria);
     }
 
     protected Movie(Parcel in) {
@@ -131,6 +146,8 @@ public class Movie implements Parcelable {
         overview = in.readString();
         vote_average = in.readString();
         release_date = in.readString();
+        favourite = in.readByte() != 0;
+        criteria = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

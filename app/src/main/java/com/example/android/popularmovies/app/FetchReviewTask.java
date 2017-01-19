@@ -2,20 +2,11 @@ package com.example.android.popularmovies.app;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.CardView;
-import android.text.method.LinkMovementMethod;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.example.android.popularmovies.app.data.MovieContract;
-import com.example.android.popularmovies.app.data.MovieDbHelper;
 import com.example.android.popularmovies.app.data.Review;
 
 import org.json.JSONArray;
@@ -29,22 +20,21 @@ import java.net.URL;
  * Created by mhuertas on 9/01/17.
  */
 
-public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
+public class FetchReviewTask extends AsyncTask<String,Void,Void> {
 
     private final String LOG_TAG = FetchReviewTask.class.getSimpleName();
-    //TODO The number of words depending on layout
-    private static int FIRST_N_WORDS = 15;
+
+    /**
+     *  Context to access resources.
+     */
     private Context mContext;
-    private View mView;
 
-
-    public FetchReviewTask(Context context,View view) {
+    public FetchReviewTask(Context context) {
         this.mContext=context;
-        this.mView=view;
     }
 
     @Override
-    protected Review[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         Uri builtUri = buildUri(params[0]);
 
         Log.v(LOG_TAG, "Reviews URL: " + builtUri.toString());
@@ -52,7 +42,6 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
             URL url = new URL(builtUri.toString());
             Review[] reviews = parseResponce(Utility.request(url));
             insertDB(Integer.parseInt(params[0]),reviews);
-            return reviews;
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (JSONException e) {
@@ -61,66 +50,13 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         return null;
     }
 
-    public int dpToPx(int dp) {
-        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-    }
-
-    @Override
-    protected void onPostExecute(Review[] result) {
-        super.onPostExecute(result);
-
-        if (result != null) {
-            LinearLayout layout = (LinearLayout)mView.findViewById(R.id.moview_linear_layout);
-            for (Review review: result) {
-                //Add Card View
-                layout.addView(buildReviewCard(review));
-            }
-        }
-    }
-
-    private CardView buildReviewCard(Review review) {
-        CardView card = new CardView( new ContextThemeWrapper(mContext, R.style.CardViewStyle) , null, 0);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        int margin = dpToPx(5);
-        params.setMargins(margin, margin, margin, margin);
-        card.setLayoutParams(params);
-
-        LinearLayout cardInner = new LinearLayout(new ContextThemeWrapper(mContext, R.style.Widget_CardContent));
-
-        TextView tv_title = new TextView(new ContextThemeWrapper(mContext, R.style.CardViewTextStyle));
-        tv_title.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        tv_title.setText("Review by " + review.getAuthor()); //TODO String in other file.
-
-        TextView tv_overview = new TextView(new ContextThemeWrapper(mContext, R.style.CardViewTextStyle));
-        tv_overview.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        tv_overview.setText(Utility.getFirstNStrings(review.getContent(),FIRST_N_WORDS));
-
-        //TODO For the moment it shows the URL, it will be possible to use a fragment to show the
-        //complete review.
-        TextView tv_url = new TextView(new ContextThemeWrapper(mContext, R.style.CardViewTextStyle));
-        tv_url.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        tv_url.setText(Utility.buildUrlReadMore(review.getUrl()));
-        tv_url.setMovementMethod(LinkMovementMethod.getInstance());
-
-        cardInner.addView(tv_title);
-        cardInner.addView(tv_overview);
-        cardInner.addView(tv_url);
-
-        card.addView(cardInner);
-
-        return card;
-    }
-
+    /**
+     * Build the URI for the Movie service API call.
+     *
+     * @param ID    The ID for the movie to get the reviews from.
+     *
+     * @return      The URI.
+     */
     private Uri buildUri(String ID) {
         // Construct the URL
         final String APPID_PARAM = "api_key";
@@ -137,6 +73,14 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         return builtUri;
     }
 
+    /**
+     * Parse the responce from the Movie API service.
+     *
+     * @param reviewsJsonStr    The responce in JSON.
+     * @return                  A list of Review Objects.
+     *
+     * @throws JSONException    Error parsing the responce from serivce.
+     */
     private Review[] parseResponce(String reviewsJsonStr) throws JSONException {
         // These are the names of the JSON objects that need to be extracted.
         final String REVIEW_ID = "id";
@@ -168,8 +112,16 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
         return results;
     }
 
+    /**
+     * Insert the movies Reviews into the database using a content provider.
+     *
+     * @param movieId   The movie id for the review.
+     * @param reviews   A list of reviews
+     */
     private void insertDB(Integer movieId,Review[] reviews) {
-        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+        ContentValues[] values = new ContentValues[reviews.length];
+        int i=0;
+
         for (Review review : reviews) {
             ContentValues reviewValues = new ContentValues();
 
@@ -178,9 +130,9 @@ public class FetchReviewTask extends AsyncTask<String,Void,Review[]> {
             reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT, review.getContent());
             reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_ID, review.getId());
             reviewValues.put(MovieContract.ReviewEntry.COLUMN_REVIEW_MOVIE_ID, movieId);
-
-            db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, reviewValues);
+            values[i++]=reviewValues;
         }
-        db.close();
+        mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,values);
     }
+
 }

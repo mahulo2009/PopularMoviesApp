@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.example.android.popularmovies.app.data.Movie;
+
 /**
  * Created by mhuertas on 14/01/17.
  */
@@ -29,17 +31,15 @@ public class MovieViewPagerAdapter extends FragmentPagerAdapter {
 
         switch (position) {
             case POPULAR:
-                bundle.putString(MainFragment.ORDER_BY_KEY,"popular");
+                bundle.putString(MainFragment.ORDER_BY_KEY, Movie.POPULAR_MOVIE);
                 break;
             case RATED:
-                bundle.putString(MainFragment.ORDER_BY_KEY,"top_rated");
+                bundle.putString(MainFragment.ORDER_BY_KEY,Movie.TOP_RATED_MOVIE);
                 break;
             case FAVOURITE:
-                //TODO TO INCLUDE THE FAVOURITE FRAGMENT
-                bundle.putString(MainFragment.ORDER_BY_KEY,"top_rated");
+                bundle.putString(MainFragment.ORDER_BY_KEY,Movie.FAVOURITE_MOVIE);
                 break;
             default:
-                bundle.putString(MainFragment.ORDER_BY_KEY,"top_rated");
                 break;
         }
         f.setArguments(bundle);
