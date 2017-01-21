@@ -10,7 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MovieDbHelper  extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
+
     public static final String DATABASE_NAME = "movie.db";
 
 
@@ -20,6 +21,13 @@ public class MovieDbHelper  extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
+        final String SQL_CREATE_MOVIE_FAVORITE_TABLE="CREATE TABLE " + MovieContract.MovieFavoriteEntry.TABLE_NAME + " (" +
+                MovieContract.MovieFavoriteEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_POSTER_PATH + " TEXT NOT NULL, " +
+                " UNIQUE (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_MOVIE_TABLE="CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY," +
@@ -59,6 +67,7 @@ public class MovieDbHelper  extends SQLiteOpenHelper {
                 " UNIQUE (" + MovieContract.ReviewEntry.COLUMN_REVIEW_ID + ") ON CONFLICT REPLACE);";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
+        db.execSQL(SQL_CREATE_MOVIE_FAVORITE_TABLE);
         db.execSQL(SQL_CREATE_TRAILER_TABLE);
         db.execSQL(SQL_CREATE_REVIEW_TABLE);
     }
@@ -66,9 +75,9 @@ public class MovieDbHelper  extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieFavoriteEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.TrailerEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.ReviewEntry.TABLE_NAME);
-
         onCreate(db);
     }
 }

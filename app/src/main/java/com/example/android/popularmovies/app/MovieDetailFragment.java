@@ -9,7 +9,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.CardView;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -105,7 +103,6 @@ public class MovieDetailFragment extends Fragment implements
      * The URI for the movie.
      */
     private Uri mUri;
-    private boolean mExtraDataInserted;
 
     public MovieDetailFragment() {
     }
@@ -148,27 +145,26 @@ public class MovieDetailFragment extends Fragment implements
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
+                //TODO QUERY TO MOVI_FAVORITE.
+/*
                 if (mMovie.isFavourite()) {
                     mMovie.setFavourite(false);
                 } else {
                     mMovie.setFavourite(true);
                 }
-                updateFavouriteButton();
                 */
+                updateFavouriteButton();
             }
         });
-        mExtraDataInserted = false;
-
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         getLoaderManager().initLoader(TRAILER_LOADER, null, this);
         getLoaderManager().initLoader(REVIEW_LOADER, null, this);
+
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -239,9 +235,9 @@ public class MovieDetailFragment extends Fragment implements
             case TRAILER_LOADER: {
                 if (data != null && data.moveToFirst()) {
                     LinearLayout layout = (LinearLayout)getActivity().findViewById(R.id.trailer_linear_layout);
+                    layout.removeAllViews();
                     while (data.moveToNext()) {
-                        //Add Card View
-                        layout.addView(buildTrailerCard(data));
+                        buildTrailerCard(data,layout);
                     }
                 }
                 break;
@@ -249,9 +245,9 @@ public class MovieDetailFragment extends Fragment implements
             case REVIEW_LOADER: {
                 if (data != null && data.moveToFirst()) {
                     LinearLayout layout = (LinearLayout)getActivity().findViewById(R.id.review_linear_layout);
+                    layout.removeAllViews();
                     while (data.moveToNext()) {
-                        //Add Card View
-                        layout.addView(buildReviewCard(data));
+                        buildReviewCard(data,layout);
                     }
                 }
                 break;
@@ -262,22 +258,22 @@ public class MovieDetailFragment extends Fragment implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
-/*
+
     private void updateFavouriteButton() {
+        //TODO
+        /*
         if (mMovie.isFavourite()) {
             mImageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.btn_star_big_on));
         } else {
             mImageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.btn_star_big_off));
         }
+        */
     }
-*/
+
     @Override
     public void onStart() {
         super.onStart();
-        if (!mExtraDataInserted) {
-            updateTrailers();
-        }
-
+        updateTrailers();
     }
 
     /**
@@ -313,32 +309,13 @@ public class MovieDetailFragment extends Fragment implements
 
     @Override
     public void onTrailerInserted() {
-        if (!mExtraDataInserted) {
-            updateReviews();
-
-            getLoaderManager().restartLoader(REVIEW_LOADER,null,this);
-        }
+        updateReviews();
+        getLoaderManager().restartLoader(REVIEW_LOADER,null,this);
     }
 
     //TODO Move to a CursorAdapter
-    private CardView buildTrailerCard(Cursor cursor) {
-
-        int margin = Utility.dpToPx(getContext(),5);
-        int padding = margin;
-
-        CardView card = new CardView( new ContextThemeWrapper(getContext(), R.style.CardViewStyle) , null, 0);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(margin, margin, margin, margin);
-        card.setLayoutParams(params);
-
-        HorizontalScrollView scrollView = new HorizontalScrollView(getContext());
-        LinearLayout cardInner = new LinearLayout(new ContextThemeWrapper(getContext(), R.style.Widget_CardContent));
-        cardInner.setOrientation(LinearLayout.HORIZONTAL);
-
-
+    private void buildTrailerCard(Cursor cursor,LinearLayout layout) {
+        int padding = Utility.dpToPx(getContext(),5);
         ImageView iv_trailer = new ImageView(getContext());
         iv_trailer.setTag(cursor.getString(COLUMN_TRAILER_KEY));
         iv_trailer.setPadding(padding ,padding ,padding ,padding );
@@ -353,38 +330,24 @@ public class MovieDetailFragment extends Fragment implements
             }
         });
         Picasso.with(getContext()).load(buildImageFirstFotogram(cursor.getString(COLUMN_TRAILER_KEY))).into(iv_trailer);
-        cardInner.addView(iv_trailer);
-
-        scrollView.addView(cardInner);
-        card.addView(scrollView);
-
-        return card;
+        layout.addView(iv_trailer);
     }
 
     //TODO Move to a CursorAdapter
-    private CardView buildReviewCard(Cursor cursor) {
-        CardView card = new CardView( new ContextThemeWrapper(getContext(), R.style.CardViewStyle) , null, 0);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        int margin = Utility.dpToPx(getContext(),5);
-        params.setMargins(margin, margin, margin, margin);
-        card.setLayoutParams(params);
-
-        LinearLayout cardInner = new LinearLayout(new ContextThemeWrapper(getContext(), R.style.Widget_CardContent));
-
+    private void buildReviewCard(Cursor cursor,LinearLayout layout) {
         TextView tv_title = new TextView(new ContextThemeWrapper(getContext(), R.style.CardViewTextStyle));
         tv_title.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
         ));
         tv_title.setText("Review by " + cursor.getString(COLUMN_REVIEW_AUTHOR)); //TODO String in other file.
+        layout.addView(tv_title);
 
         TextView tv_overview = new TextView(new ContextThemeWrapper(getContext(), R.style.CardViewTextStyle));
         tv_overview.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
         ));
-        tv_overview.setText(Utility.getFirstNStrings(cursor.getString(COLUMN_REVIEW_CONTENT),FIRST_N_WORDS));
+        tv_overview.setText(Utility.getFirstNStrings(cursor.getString(COLUMN_REVIEW_CONTENT), FIRST_N_WORDS));
+        layout.addView(tv_overview);
 
         //TODO For the moment it shows the URL, it will be possible to use a fragment to show the
         //complete review.
@@ -394,14 +357,7 @@ public class MovieDetailFragment extends Fragment implements
         ));
         tv_url.setText(Utility.buildUrlReadMore(cursor.getString(COLUMN_REVIEW_URL)));
         tv_url.setMovementMethod(LinkMovementMethod.getInstance());
-
-        cardInner.addView(tv_title);
-        cardInner.addView(tv_overview);
-        cardInner.addView(tv_url);
-
-        card.addView(cardInner);
-
-        return card;
+        layout.addView(tv_url);
     }
 
 }

@@ -86,4 +86,12 @@ public class TestUtilities {
         }
         return returnContentValues;
     }
+
+    public static ContentValues createMovieFavoriteValues(int i) {
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE, "Dancing in the rain");
+        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_POSTER_PATH, "http://");
+        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID, 1);
+        return movieValues;
+    }
 }

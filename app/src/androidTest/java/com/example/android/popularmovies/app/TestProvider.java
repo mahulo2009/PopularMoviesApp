@@ -14,11 +14,13 @@ import com.example.android.popularmovies.app.data.MovieContract;
 import com.example.android.popularmovies.app.data.MovieDbHelper;
 import com.example.android.popularmovies.app.data.MovieProvider;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.example.android.popularmovies.app.TestUtilities.BULK_INSERT_RECORDS_TO_INSERT;
+import static com.example.android.popularmovies.app.data.MovieContract.MovieEntry.buildMovieUriAPIId;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -28,6 +30,7 @@ import static junit.framework.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class TestProvider {
+
 
     public void deleteAllRecordsFromProvider() {
         Context mContext = InstrumentationRegistry.getTargetContext();
@@ -47,6 +50,12 @@ public class TestProvider {
                 null,
                 null
         );
+        mContext.getContentResolver().delete(
+                MovieContract.MovieFavoriteEntry.CONTENT_URI,
+                null,
+                null
+        );
+
 
         Cursor cursor = mContext.getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI,
@@ -77,12 +86,28 @@ public class TestProvider {
         );
         assertEquals("Error: Records not deleted from Trailer table during delete", 0, cursor.getCount());
         cursor.close();
+
+        cursor = mContext.getContentResolver().query(
+                MovieContract.MovieFavoriteEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        assertEquals("Error: Records not deleted from MovieFavorite table during delete", 0, cursor.getCount());
+        cursor.close();
     }
 
     @Before
     public void setUp() throws Exception {
         deleteAllRecordsFromProvider();
     }
+
+    @After
+    public void shutDown() throws Exception {
+        deleteAllRecordsFromProvider();
+    }
+
 
     @Test
     public void testProviderRegistry() {
@@ -123,10 +148,27 @@ public class TestProvider {
         String testMovieID = "1";
         // content://com.example.android.popularmovies.app/movie/1
         type = mContext.getContentResolver().getType(
-                MovieContract.MovieEntry.buildMovieUriAPIId(testMovieID));
+                buildMovieUriAPIId(testMovieID));
         // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
         assertEquals("Error: the MovieEntry CONTENT_URI with id should return MovieEntry.CONTENT_TYPE",
                 MovieContract.MovieEntry.CONTENT_ITEM_TYPE, type);
+
+        //TODO ADD Review and Trail
+
+        // content://com.example.android.popularmovies.app/movie_favorite/
+        type = mContext.getContentResolver().getType(MovieContract.MovieFavoriteEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.popularmovies.app/movie_favorite
+        assertEquals("Error: the MovieFavoriteEntry CONTENT_URI should return MovieFavoriteEntry.CONTENT_TYPE",
+                MovieContract.MovieFavoriteEntry.CONTENT_TYPE, type);
+
+        testMovieID = "1";
+        // content://com.example.android.popularmovies.app/movie_favorite/1
+        type = mContext.getContentResolver().getType(
+                MovieContract.MovieFavoriteEntry.buildMovieFavoriteUri(1));
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        assertEquals("Error: the MovieFavoriteEntry CONTENT_URI with id should return MovieFavoriteEntry.CONTENT_TYPE",
+                MovieContract.MovieFavoriteEntry.CONTENT_ITEM_TYPE, type);
+
     }
 
     @Test
@@ -149,6 +191,36 @@ public class TestProvider {
     }
 
     @Test
+    public void testBasicMovieFavoriteQuery() {
+        Context mContext = InstrumentationRegistry.getTargetContext();
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+
+        ContentValues movieFavoriteValues = TestUtilities.createMovieFavoriteValues(1);
+        db.insert(MovieContract.MovieFavoriteEntry.TABLE_NAME, null, movieFavoriteValues);
+
+        // Test the basic content provider query
+        Cursor c = mContext.getContentResolver().query(
+                MovieContract.MovieFavoriteEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testBasicMovieFavoriteQuery", c, movieFavoriteValues);
+
+
+        c = mContext.getContentResolver().query(
+                MovieContract.MovieFavoriteEntry.buildMovieFavoriteUri(1),
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testBasicMovieQuery", c, movieFavoriteValues);
+    }
+
+
+        @Test
     public void testBasicReviewQuery() {
         Context mContext = InstrumentationRegistry.getTargetContext();
         SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
@@ -194,6 +266,8 @@ public class TestProvider {
         ContentValues movieValues = TestUtilities.createMovieValues();
         long movieRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movieValues);
 
+        //TODO RECOVER THIS
+
         /*
         ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
         db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, reviewValues);
@@ -203,7 +277,7 @@ public class TestProvider {
 */
         // Test the basic content provider query
         Cursor c = mContext.getContentResolver().query(
-                MovieContract.MovieEntry.buildMovieUriAPIId("1"),
+                buildMovieUriAPIId("1"),
                 null,
                 null,
                 null,
@@ -235,6 +309,10 @@ public class TestProvider {
         TestUtilities.validateCursor("testBasicMovieQuery", c, trailerValues);
     }
 
+    @Test
+    public void testMovieFavoriteQuery() {
+        //TODO.
+    }
 
     @Test
     public void testBulkInsert() {

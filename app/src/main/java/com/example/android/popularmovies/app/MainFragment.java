@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.android.popularmovies.app.data.Movie;
 import com.example.android.popularmovies.app.data.MovieContract;
 
 /**
@@ -128,11 +129,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     /**
      * Fetch the movie data from API movie service.
      */
+    //TODO This method will became obsoleto when the sync manger used.
     public void updateMovies() {
         if (Utility.isOnline(getActivity())) {
-            //If there is internet connection make the API request in the background.
-            FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(getContext());
-            fetchMoviesTask.execute(mOrderBy);
+            //If the order by is not Favourite, request to internet.
+            if (!mOrderBy.equals(Movie.FAVOURITE_MOVIE)) {
+                //If there is internet connection make the API request in the background.
+                FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(getContext());
+                fetchMoviesTask.execute(mOrderBy);
+            }
         } else  {
             Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG,"NOT internet connectivity for the moment");

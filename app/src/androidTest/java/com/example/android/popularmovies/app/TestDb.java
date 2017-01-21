@@ -10,6 +10,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.example.android.popularmovies.app.data.MovieContract;
 import com.example.android.popularmovies.app.data.MovieDbHelper;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +38,12 @@ public class TestDb {
     public void setUp() throws Exception {
         deleteTheDatabase();
     }
+
+    @After
+    public void shutDown() throws Exception {
+        deleteTheDatabase();
+    }
+
 
     @Test
     public void useAppContext() throws Exception {
@@ -67,7 +74,7 @@ public class TestDb {
         // verify that the tables have been created
         do {
             tableNameHashSet.remove(c.getString(0));
-        } while( c.moveToNext() );
+        } while (c.moveToNext());
 
         assertTrue("Error: Your database was created without both the location entry and weather entry tables",
                 tableNameHashSet.isEmpty());
@@ -101,7 +108,7 @@ public class TestDb {
                 null  // sort order
         );
         // Move the cursor to the first valid database row and check to see if we have any rows
-        assertTrue( "Error: No Records returned from location query", reviewCursor.moveToFirst() );
+        assertTrue("Error: No Records returned from location query", reviewCursor.moveToFirst());
 
         // Fifth Step: Validate the location Query
         TestUtilities.validateCurrentRecord("testInsertReadDb reviewEntry failed to validate",
@@ -136,7 +143,7 @@ public class TestDb {
                 null  // sort order
         );
         // Move the cursor to the first valid database row and check to see if we have any rows
-        assertTrue( "Error: No Records returned from location query", trailerCursor.moveToFirst() );
+        assertTrue("Error: No Records returned from location query", trailerCursor.moveToFirst());
 
         // Fifth Step: Validate the location Query
         TestUtilities.validateCurrentRecord("testInsertReadDb reviewEntry failed to validate",
@@ -159,4 +166,33 @@ public class TestDb {
         return movieRowId;
     }
 
+    @Test
+    public void testMovieFavouriteTable() {
+        SQLiteDatabase db = new MovieDbHelper(
+                InstrumentationRegistry.getTargetContext()).getWritableDatabase();
+
+        ContentValues testValues = TestUtilities.createMovieFavoriteValues(1);
+
+        long movieFavoriteRowId;
+        movieFavoriteRowId = db.insert(MovieContract.MovieFavoriteEntry.TABLE_NAME, null, testValues);
+
+        Cursor favoriteCursor = db.query(
+                MovieContract.MovieFavoriteEntry.TABLE_NAME,  // Table to Query
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null  // sort order
+        );
+        // Move the cursor to the first valid database row and check to see if we have any rows
+        assertTrue("Error: No Records returned from location query", favoriteCursor.moveToFirst());
+
+        // Fifth Step: Validate the location Query
+        TestUtilities.validateCurrentRecord("testInsertReadDb movieFavorite failed to validate",
+                favoriteCursor, testValues);
+
+        favoriteCursor.close();
+        db.close();
+    }
 }
