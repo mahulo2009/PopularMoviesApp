@@ -42,7 +42,6 @@ public class TestUtilities {
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, "Dancing in the rain");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, "Nice");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, "http://");
-        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE, "1");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, "1952");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, "8");
         movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, 1);
@@ -77,7 +76,6 @@ public class TestUtilities {
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, "Dancing in the rain");
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, "Nice");
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, "http://");
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE, "1");
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, "1952");
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, "8");
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, i);
@@ -87,11 +85,9 @@ public class TestUtilities {
         return returnContentValues;
     }
 
-    public static ContentValues createMovieFavoriteValues(int i) {
+    public static ContentValues createMovieFavoriteValues(long i) {
         ContentValues movieValues = new ContentValues();
-        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE, "Dancing in the rain");
-        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_POSTER_PATH, "http://");
-        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID, 1);
+        movieValues.put(MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID, i);
         return movieValues;
     }
 }

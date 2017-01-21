@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MovieDbHelper  extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 15;
 
     public static final String DATABASE_NAME = "movie.db";
 
@@ -23,11 +23,12 @@ public class MovieDbHelper  extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         final String SQL_CREATE_MOVIE_FAVORITE_TABLE="CREATE TABLE " + MovieContract.MovieFavoriteEntry.TABLE_NAME + " (" +
-                MovieContract.MovieFavoriteEntry._ID + " INTEGER PRIMARY KEY," +
-                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
-                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
-                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_POSTER_PATH + " TEXT NOT NULL, " +
-                " UNIQUE (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
+                MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID + " INTEGER NOT NULL, " +
+
+                "FOREIGN KEY (" + MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID + ") REFERENCES " +
+                MovieContract.MovieEntry.TABLE_NAME +  " (" + MovieContract.MovieEntry._ID + ")," +
+
+                " UNIQUE (" + MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_MOVIE_TABLE="CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY," +
@@ -37,7 +38,6 @@ public class MovieDbHelper  extends SQLiteOpenHelper {
                 MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA + " TEXT NOT NULL, " +
                 " UNIQUE (" + MovieContract.MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 

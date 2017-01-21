@@ -1,11 +1,13 @@
 package com.example.android.popularmovies.app;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.view.ContextThemeWrapper;
@@ -53,6 +55,7 @@ public class MovieDetailFragment extends Fragment implements
      */
     private static final int REVIEW_LOADER = 2;
 
+    private boolean mIsFavorite;
 
     private static final String[] DETAIL_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
@@ -60,16 +63,16 @@ public class MovieDetailFragment extends Fragment implements
             MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH,
             MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE,
-            MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE,
-            MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW
+            MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW,
+            MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID
     };
     public static final int COL_MOVIE_ID = 0;
     public static final int COLUMN_MOVIE_TITLE = 1;
     public static final int COLUMN_MOVIE_POSTER_PATH = 2;
     public static final int COLUMN_MOVIE_RELEASE_DATE = 3;
     public static final int COLUMN_MOVIE_VOTE_AVERAGE = 4;
-    public static final int COLUMN_MOVIE_FAVOURITE = 5;
-    public static final int COLUMN_MOVIE_OVERVIEW = 6;
+    public static final int COLUMN_MOVIE_OVERVIEW = 5;
+    public static final int COLUMN_MOVIE_FAVORITE = 6;
 
     private static final String[] TRAILER_COLUMNS = {
             MovieContract.TrailerEntry.TABLE_NAME + "." + MovieContract.TrailerEntry._ID,
@@ -132,10 +135,11 @@ public class MovieDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //Inflate
         View rootView = inflater.inflate(R.layout.fragment_movie_deatil, container, false);
-
+        //Read the URI for the movie.
         mUri = getActivity().getIntent().getData();
-
+        //Create the UI elements
         mTitleTextView = (TextView)rootView.findViewById(R.id.movie_title_textview);
         mReleaseDateTextView = (TextView)rootView.findViewById(R.id.movie_releasedate_textview);
         mRatingTextView = (TextView)rootView.findViewById(R.id.movie_user_rating_textview);
@@ -145,15 +149,28 @@ public class MovieDetailFragment extends Fragment implements
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO QUERY TO MOVI_FAVORITE.
-/*
-                if (mMovie.isFavourite()) {
-                    mMovie.setFavourite(false);
-                } else {
-                    mMovie.setFavourite(true);
+                if (null != mUri) {
+                    if (mIsFavorite) {
+                        //TODO INCLUDE IN PROVIDER QUERY.
+                        mIsFavorite = false;
+                        //Remove from the favourite table
+                        String sMovieSelection =
+                                MovieContract.MovieFavoriteEntry.TABLE_NAME +
+                                        "." + MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID + " = ? ";
+                        String[] selectionArgs = new String[]{MovieContract.MovieEntry.getMovieIdFromUri(mUri)};
+                        getContext().getContentResolver().delete(MovieContract.MovieFavoriteEntry.CONTENT_URI, sMovieSelection, selectionArgs);
+                        //Update UI
+                        updateFavouriteButton();
+                    } else {
+                        mIsFavorite = true;
+                        //Add to the favourite table
+                        ContentValues values = new ContentValues();
+                        values.put(MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID, MovieContract.MovieEntry.getMovieIdFromUri(mUri));
+                        getContext().getContentResolver().insert(MovieContract.MovieFavoriteEntry.CONTENT_URI, values);
+                        //Update UI
+                        updateFavouriteButton();
+                    }
                 }
-                */
-                updateFavouriteButton();
             }
         });
         return rootView;
@@ -164,7 +181,6 @@ public class MovieDetailFragment extends Fragment implements
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         getLoaderManager().initLoader(TRAILER_LOADER, null, this);
         getLoaderManager().initLoader(REVIEW_LOADER, null, this);
-
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -228,7 +244,8 @@ public class MovieDetailFragment extends Fragment implements
                     mRatingTextView.setText(Utility.appendRating(data.getString(COLUMN_MOVIE_VOTE_AVERAGE)));
                     mOverViewTextView.setText(data.getString(COLUMN_MOVIE_OVERVIEW));
                     Picasso.with(getContext()).load(data.getString(COLUMN_MOVIE_POSTER_PATH)).into(mImageView);
-                    //updateFavouriteButton();
+                    mIsFavorite = data.getString(COLUMN_MOVIE_FAVORITE) == null ? false: true;
+                    updateFavouriteButton();
                 }
                 break;
             }
@@ -260,14 +277,11 @@ public class MovieDetailFragment extends Fragment implements
     }
 
     private void updateFavouriteButton() {
-        //TODO
-        /*
-        if (mMovie.isFavourite()) {
+        if (mIsFavorite) {
             mImageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.btn_star_big_on));
         } else {
             mImageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), android.R.drawable.btn_star_big_off));
         }
-        */
     }
 
     @Override

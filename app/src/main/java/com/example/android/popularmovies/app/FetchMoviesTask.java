@@ -168,7 +168,6 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Void> {
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPoster_path());
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_FAVOURITE, movie.isFavourite());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getRelease_date());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVote_average());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA,orderBy );

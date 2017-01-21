@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.example.android.popularmovies.app.TestUtilities.BULK_INSERT_RECORDS_TO_INSERT;
+import static com.example.android.popularmovies.app.data.MovieContract.MovieEntry.buildMovieUri;
 import static com.example.android.popularmovies.app.data.MovieContract.MovieEntry.buildMovieUriAPIId;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -266,24 +267,79 @@ public class TestProvider {
         ContentValues movieValues = TestUtilities.createMovieValues();
         long movieRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movieValues);
 
-        //TODO RECOVER THIS
 
-        /*
         ContentValues reviewValues = TestUtilities.createReviewValues(movieRowId);
         db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, reviewValues);
 
         ContentValues trailerValues = TestUtilities.createTrailerValues(movieRowId);
         db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, trailerValues);
-*/
+
         // Test the basic content provider query
         Cursor c = mContext.getContentResolver().query(
-                buildMovieUriAPIId("1"),
+                buildMovieUri(movieRowId),
                 null,
                 null,
                 null,
                 null
         );
         TestUtilities.validateCursor("testBasicMovieQuery", c, movieValues);
+    }
+
+    @Test
+    public void testMovieFavoriteTrueQuery() {
+        Context mContext = InstrumentationRegistry.getTargetContext();
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+
+        ContentValues movieValues = TestUtilities.createMovieValues();
+        long movieRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movieValues);
+
+        ContentValues movieFavoriteValues = TestUtilities.createMovieFavoriteValues(movieRowId);
+        db.insert(MovieContract.MovieFavoriteEntry.TABLE_NAME, null, movieFavoriteValues);
+
+        final String[] DETAIL_COLUMNS = {
+                MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+                MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID
+
+        };
+        final int COLUMN_FAVORITE_ID = 1;
+        // Test the basic content provider query
+        Cursor c = mContext.getContentResolver().query(
+                buildMovieUri(movieRowId),
+                DETAIL_COLUMNS,
+                null,
+                null,
+                null
+        );
+        assertTrue(c.moveToFirst());
+        String _id = c.getString(COLUMN_FAVORITE_ID);
+        assertEquals("1",_id);
+    }
+
+    @Test
+    public void testMovieFavoriteFalseQuery() {
+        Context mContext = InstrumentationRegistry.getTargetContext();
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+
+        ContentValues movieValues = TestUtilities.createMovieValues();
+        long movieRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movieValues);
+
+        final String[] DETAIL_COLUMNS = {
+                MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
+                MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID
+
+        };
+        final int COLUMN_FAVORITE_ID = 1;
+        // Test the basic content provider query
+        Cursor c = mContext.getContentResolver().query(
+                buildMovieUri(movieRowId),
+                DETAIL_COLUMNS,
+                null,
+                null,
+                null
+        );
+        assertTrue(c.moveToFirst());
+        String _id = c.getString(COLUMN_FAVORITE_ID);
+        assertEquals(null, _id);
     }
 
     @Test

@@ -30,10 +30,7 @@ public class MovieContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE_FAVORITE;
 
         public static final String TABLE_NAME = "movie_favorite";
-
-        public static final String COLUMN_MOVIE_ID = "ID";
-        public static final String COLUMN_MOVIE_TITLE = "title";
-        public static final String COLUMN_MOVIE_POSTER_PATH = "poster_path";
+        public static final String COLUMN_FAVORITE_MOVIE_ID = "movie_id";
 
         public static Uri buildMovieFavoriteUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -56,13 +53,12 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "movie";
 
-        public static final String COLUMN_MOVIE_ID = "ID";
+        public static final String COLUMN_MOVIE_ID = "api_id";
         public static final String COLUMN_MOVIE_TITLE = "title";
         public static final String COLUMN_MOVIE_POSTER_PATH = "poster_path";
         public static final String COLUMN_MOVIE_OVERVIEW = "overview";
         public static final String COLUMN_MOVIE_VOTE_AVERAGE = "vote_average";
         public static final String COLUMN_MOVIE_RELEASE_DATE = "release_date";
-        public static final String COLUMN_MOVIE_FAVOURITE = "favourite";
         public static final String COLUMN_MOVIE_CRITERIA = "criteria";
 
         //ID from the MOVIE API
@@ -92,7 +88,7 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "trailer";
 
-        public static final String COLUMN_TRAILER_ID = "ID";
+        public static final String COLUMN_TRAILER_ID = "api_id";
         public static final String COLUMN_TRAILER_KEY = "key";
         public static final String COLUMN_TRAILER_NAME = "name";
         public static final String COLUMN_TRAILER_MOVIE_ID = "movie_id";
@@ -113,7 +109,7 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "review";
 
-        public static final String COLUMN_REVIEW_ID = "ID";
+        public static final String COLUMN_REVIEW_ID = "api_id";
         public static final String COLUMN_REVIEW_AUTHOR = "author";
         public static final String COLUMN_REVIEW_CONTENT = "content";
         public static final String COLUMN_REVIEW_URL = "url";

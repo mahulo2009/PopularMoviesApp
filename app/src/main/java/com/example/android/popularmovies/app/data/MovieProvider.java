@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -28,6 +29,20 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE_FAVORITE = 400;
     static final int MOVIE_FAVORITE_WITH_ID = 401;
 
+    private static final SQLiteQueryBuilder sMovieWithFavoriteQueryBuilder;
+    static{
+        sMovieWithFavoriteQueryBuilder = new SQLiteQueryBuilder();
+        //This is an inner join which looks like
+        //weather INNER JOIN location ON weather.location_id = location._id
+        sMovieWithFavoriteQueryBuilder.setTables(
+                MovieContract.MovieEntry.TABLE_NAME + " LEFT JOIN " +
+                        MovieContract.MovieFavoriteEntry.TABLE_NAME +
+                        " ON " + MovieContract.MovieEntry.TABLE_NAME +
+                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
+                        " = " + MovieContract.MovieFavoriteEntry.TABLE_NAME +
+                        "." + MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID);
+    }
+
     //movie.id = ?
     private static final String sMovieSelection =
             MovieContract.MovieEntry.TABLE_NAME+
@@ -35,8 +50,7 @@ public class MovieProvider extends ContentProvider {
     private Cursor getMovieByID(Uri uri, String[] projection, String sortOrder) {
         String movieId = MovieContract.MovieEntry.getMovieIdFromUri(uri);
 
-        return mOpenHelper.getReadableDatabase().query(
-                MovieContract.MovieEntry.TABLE_NAME,
+        return sMovieWithFavoriteQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sMovieSelection,
                 new String[]{movieId},
@@ -49,7 +63,7 @@ public class MovieProvider extends ContentProvider {
     //movie_favorite.id = ?
     private static final String sMovieFavoriteSelection =
             MovieContract.MovieFavoriteEntry.TABLE_NAME+
-                    "." + MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID + " = ? ";
+                    "." + MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID + " = ? ";
     private Cursor getMovieFavoriteByID(Uri uri, String[] projection, String sortOrder) {
         String movieFavoriteId = MovieContract.MovieFavoriteEntry.getMovieFavoriteIdFromUri(uri);
 
