@@ -141,8 +141,7 @@ public class MovieProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case MOVIE:
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
+                retCursor = sMovieWithFavoriteQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                         projection,
                         selection,
                         selectionArgs,

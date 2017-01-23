@@ -53,7 +53,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private static final String[] MOVIE_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID,
-            MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
+            MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH,
+            MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID
     };
     static final int COLUMN_MOVIE_ID=1;
     static final int COLUMN_MOVIE_POSTER_PATH=2;
@@ -96,6 +97,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onActivityCreated(savedInstanceState);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        //TODO Find out the good way to notify the data change.
+        //For example, if the user select a movie as favorite.
+        getLoaderManager().restartLoader(MOVIE_LOADER,null,this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -147,11 +155,17 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //TODO: This can be a type of query to the provider.
-        String sMovieCriteriaSelection =
-                MovieContract.MovieEntry.TABLE_NAME+
-                        "." + MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA + " = ? ";
-        String[]  selectionArgs = new String[]{mOrderBy};
-
+        String sMovieCriteriaSelection;
+        String[] selectionArgs = null;
+        if (!mOrderBy.equals(Movie.FAVOURITE_MOVIE)) {
+            sMovieCriteriaSelection =
+                    MovieContract.MovieEntry.TABLE_NAME +
+                            "." + MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA + " = ? ";
+            selectionArgs = new String[]{mOrderBy};
+        } else {
+            sMovieCriteriaSelection =
+                             MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID + " is not null ";
+        }
         //Build the URI.
         Uri movieUri = MovieContract.MovieEntry.CONTENT_URI;
         return new CursorLoader(getActivity(),
