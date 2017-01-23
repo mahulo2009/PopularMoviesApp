@@ -1,9 +1,7 @@
 1. Review inside a fragment. Not web page.
 2. Trailer inside app, using Youtube API.
-3. Add Favourites.
-4. DDBB to cache information from web.
-5. Layout for different screen size.
-6. Remove the setting to select order, include diffent tags.
+3. Layout for different screen size.
+
 
 
 
