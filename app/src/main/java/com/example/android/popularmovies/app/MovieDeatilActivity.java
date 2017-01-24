@@ -21,7 +21,13 @@ public class MovieDeatilActivity  extends AppCompatActivity {
         //Startup the detail fragment.
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new MovieDetailFragment())
+                    .add(R.id.container_overview, new MovieDetailFragment())
+                    .commit();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container_trailer, new TrailerFragment())
+                    .commit();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container_review, new ReviewFragment())
                     .commit();
         }
     }
