@@ -25,7 +25,6 @@ public class MovieProvider extends ContentProvider {
     static final int TRAILER_MOVIE_ID = 201;
     static final int REVIEW = 300;
     static final int REVIEW_MOVIE_ID = 301;
-
     static final int MOVIE_FAVORITE = 400;
     static final int MOVIE_FAVORITE_WITH_ID = 401;
 

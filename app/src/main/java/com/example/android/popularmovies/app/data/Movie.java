@@ -18,6 +18,7 @@ public class Movie implements Parcelable {
 
     private String id;
     private String title;
+    private String backdrop_path;
     private String poster_path;
     private String overview;
     private String vote_average;
@@ -52,6 +53,14 @@ public class Movie implements Parcelable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getBackdrop_path() {
+        return backdrop_path;
+    }
+
+    public void setBackdrop_path(String backdrop_path) {
+        this.backdrop_path = backdrop_path;
     }
 
     public String getPoster_path() {
@@ -131,6 +140,7 @@ public class Movie implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(title);
+        dest.writeString(backdrop_path);
         dest.writeString(poster_path);
         dest.writeString(overview);
         dest.writeString(vote_average);
@@ -142,6 +152,7 @@ public class Movie implements Parcelable {
     protected Movie(Parcel in) {
         id=in.readString();
         title = in.readString();
+        backdrop_path = in.readString();
         poster_path = in.readString();
         overview = in.readString();
         vote_average = in.readString();

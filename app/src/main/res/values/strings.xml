@@ -10,4 +10,9 @@
     <string name="title_tab_popular">POPULAR</string>
     <string name="title_tab_rated">RATED</string>
     <string name="title_tab_favourite">FAVOURITE</string>
+
+    <string name="title_tab_overview">OVERVIEW</string>
+    <string name="title_tab_trailer">TRAILERS</string>
+    <string name="title_tab_review">REVIEWS</string>
+
 </resources>

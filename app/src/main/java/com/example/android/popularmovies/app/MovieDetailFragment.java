@@ -41,7 +41,7 @@ public class MovieDetailFragment extends Fragment implements
     private static final String[] DETAIL_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
-            MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH,
+            MovieContract.MovieEntry.COLUMN_MOVIE_BACKDROP_PATH,
             MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE,
             MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW,
@@ -49,7 +49,7 @@ public class MovieDetailFragment extends Fragment implements
     };
     public static final int COL_MOVIE_ID = 0;
     public static final int COLUMN_MOVIE_TITLE = 1;
-    public static final int COLUMN_MOVIE_POSTER_PATH = 2;
+    public static final int COLUMN_MOVIE_BACKDROP_PATH = 2;
     public static final int COLUMN_MOVIE_RELEASE_DATE = 3;
     public static final int COLUMN_MOVIE_VOTE_AVERAGE = 4;
     public static final int COLUMN_MOVIE_OVERVIEW = 5;
@@ -165,7 +165,7 @@ public class MovieDetailFragment extends Fragment implements
             mReleaseDateTextView.setText(Utility.extractYear(data.getString(COLUMN_MOVIE_RELEASE_DATE)));
             mRatingTextView.setText(Utility.appendRating(data.getString(COLUMN_MOVIE_VOTE_AVERAGE)));
             mOverViewTextView.setText(data.getString(COLUMN_MOVIE_OVERVIEW));
-            Picasso.with(getContext()).load(data.getString(COLUMN_MOVIE_POSTER_PATH)).into(mImageView);
+            Picasso.with(getContext()).load(data.getString(COLUMN_MOVIE_BACKDROP_PATH)).into(mImageView);
             mIsFavorite = data.getString(COLUMN_MOVIE_FAVORITE) == null ? false: true;
             updateFavouriteButton();
         }

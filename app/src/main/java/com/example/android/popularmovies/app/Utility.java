@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -81,6 +83,26 @@ public class Utility {
         String result = "http://img.youtube.com/vi/"+url+"/0.jpg";
         return result;
     }
+
+    /**
+     * Build the complete image from the relative path.
+     *
+     * @param poster_path   relative image path
+     * @param imageSize     the image size according to API movie service, the valid values are:
+     *                      w92, w154, w185, w342, w500, w780.
+     *
+     * @return              The complete image path
+     */
+    public static String getImagePath(String poster_path,String imageSize)  {
+        URI uri = null;
+        try {
+            uri = new URI("http","image.tmdb.org","/t/p/"+imageSize + poster_path,null);
+        } catch (URISyntaxException e) {
+            return "";
+        }
+        return uri.toString();
+    }
+
 
     /**
      * Append the max rating to the rate string

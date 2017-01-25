@@ -14,9 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
+
+import static com.example.android.popularmovies.app.Utility.getImagePath;
 
 /**
  * Async task to query the API in the background to obtain a list of movies. In the UI thread
@@ -66,22 +66,6 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Void> {
         return null;
     }
 
-    /**
-     * Build the complete image from the relative path.
-     *
-     * @param poster_path   relative image path
-     *
-     * @return              The complete image path
-     */
-    private String getImagePath(String poster_path)  {
-        URI uri = null;
-        try {
-            uri = new URI("http","image.tmdb.org","/t/p/w185" + poster_path,null);
-        } catch (URISyntaxException e) {
-            return "";
-        }
-        return uri.toString();
-    }
 
     /**
      * Build the URI to access the API movie service
@@ -119,6 +103,7 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Void> {
         final String MV_ID = "id";
         final String MV_TITLE = "original_title";
         final String MV_POSTER_PATH = "poster_path";
+        final String MV_BACKDROP_PATH = "backdrop_path";
         final String MV_OVERVIEW = "overview";
         final String MV_VOTE_AVERAGE = "vote_average";
         final String MV_RELEASE_DATE = "release_date";
@@ -138,7 +123,8 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Void> {
             Movie movie = new Movie();
             movie.setId(movieJson.getString(MV_ID));
             movie.setTitle(movieJson.getString(MV_TITLE));
-            movie.setPoster_path(getImagePath(movieJson.getString(MV_POSTER_PATH)));
+            movie.setPoster_path(getImagePath(movieJson.getString(MV_POSTER_PATH),"w185"));
+            movie.setBackdrop_path(Utility.getImagePath(movieJson.getString(MV_BACKDROP_PATH),"w342"));
             movie.setOverview(movieJson.getString(MV_OVERVIEW));
             movie.setVote_average(movieJson.getString(MV_VOTE_AVERAGE));
             movie.setRelease_date(movieJson.getString(MV_RELEASE_DATE));
@@ -168,6 +154,7 @@ public class FetchMoviesTask extends AsyncTask<String,Void,Void> {
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, movie.getTitle());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, movie.getOverview());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, movie.getPoster_path());
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_BACKDROP_PATH, movie.getBackdrop_path());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE, movie.getRelease_date());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movie.getVote_average());
             movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA,orderBy );

@@ -1,6 +1,8 @@
 package com.example.android.popularmovies.app;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -18,18 +20,12 @@ public class MovieDeatilActivity  extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Startup the detail fragment.
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_overview, new MovieDetailFragment())
-                    .commit();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_trailer, new TrailerFragment())
-                    .commit();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_review, new ReviewFragment())
-                    .commit();
-        }
+        MovieDetailPagerAdapter adapter = new MovieDetailPagerAdapter(getSupportFragmentManager(),getBaseContext());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(adapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
 }
