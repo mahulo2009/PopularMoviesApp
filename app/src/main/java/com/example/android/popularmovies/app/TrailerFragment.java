@@ -33,6 +33,7 @@ public class TrailerFragment  extends Fragment implements LoaderManager.LoaderCa
             MovieContract.TrailerEntry.COLUMN_TRAILER_MOVIE_ID
     };
     public static final int COLUMN_TRAILER_KEY = 2;
+    public static final int COLUMN_TRAILER_NAME = 3;
     private Uri mUri;
 
     /**

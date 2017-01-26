@@ -20,7 +20,7 @@ import static com.example.android.popularmovies.app.ReviewFragment.COLUMN_REVIEW
 
 public class ReviewAdapter  extends CursorAdapter {
     //TODO The number of words depending on layout
-    private static int FIRST_N_WORDS = 15;
+    private static int FIRST_N_WORDS = 5000;
 
     public ReviewAdapter(Activity context, Cursor c, int flags) {
         super(context, c, flags);
