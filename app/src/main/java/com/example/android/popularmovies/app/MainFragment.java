@@ -1,6 +1,5 @@
 package com.example.android.popularmovies.app;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,8 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.example.android.popularmovies.app.data.Movie;
@@ -109,28 +108,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //Creates the array update, empty.
-        mMovieAdapter = new MovieAdapter(getActivity(), null,0);
+        mMovieAdapter = new MovieAdapter(getActivity());
 
         //Inflate the fragment.
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Create a list view to present the list of movies
-        GridView gridView = (GridView)rootView.findViewById(R.id.gridview_movies);
+        RecyclerView gridView = (RecyclerView)rootView.findViewById(R.id.gridview_movies);
+        gridView.setHasFixedSize(true);
+        GridLayoutManager layout = new GridLayoutManager(getContext(),2);
+        gridView.setLayoutManager(layout);
         gridView.setAdapter(mMovieAdapter);
-        //If the user tap a movie entry, a detail view is showed
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if (cursor != null) {
-                    //Create the URI for the detail view and start activity.
-                    Uri uri = MovieContract.MovieEntry.buildMovieUriAPIId(cursor.getString(COLUMN_MOVIE_ID));
-                    Intent detailIntent =
-                            new Intent(getActivity(),MovieDeatilActivity.class).setData(uri);
-                    startActivity(detailIntent);
-                }
-            }
-        });
+
         return rootView;
     }
 
