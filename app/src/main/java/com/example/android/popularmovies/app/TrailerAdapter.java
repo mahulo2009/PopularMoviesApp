@@ -2,10 +2,10 @@ package com.example.android.popularmovies.app;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,35 +19,67 @@ import static com.example.android.popularmovies.app.Utility.buildImageFirstFotog
  * Created by mhuertas on 23/01/17.
  */
 
-public class TrailerAdapter extends CursorAdapter {
-    public TrailerAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
+
+    private Cursor mCursor;
+    private Context mContext;
+
+    public TrailerAdapter(Context context) {
+        mContext=context;
     }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(list_item_trailer, parent, false);
-        //Cache the GUI elements to improve performance.
-        TrailerAdapter.ViewHolder viewHolder = new TrailerAdapter.ViewHolder(view);
-        view.setTag(viewHolder);
-        return view;
-    }
+    public class TrailerViewHolder  extends RecyclerView.ViewHolder {
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        TrailerAdapter.ViewHolder viewHolder = (TrailerAdapter.ViewHolder) view.getTag();
-        Picasso.with(context).
-                load(buildImageFirstFotogram(cursor.getString(COLUMN_TRAILER_KEY))).
-                into(viewHolder.iv_trailer);
-        viewHolder.tv_movie_trailer_title.setText(cursor.getString(TrailerFragment.COLUMN_TRAILER_NAME));
-    }
-
-    public class ViewHolder {
         public TextView tv_movie_trailer_title;
         public ImageView iv_trailer;
-        public ViewHolder(View view) {
+
+        public TrailerViewHolder(View view) {
+            super(view);
             iv_trailer = (ImageView)view.findViewById(R.id.trailer_imageview);
             tv_movie_trailer_title = (TextView)view.findViewById(R.id.movie_trailer_title_textview);
+
+            iv_trailer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO
+                }
+            });
         }
     }
+
+    @Override
+    public TrailerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).
+                inflate(list_item_trailer, parent, false);
+        return new TrailerAdapter.TrailerViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(TrailerViewHolder viewHolder, int position) {
+        mCursor.moveToPosition(position);
+
+        Picasso.with(mContext).
+                load(buildImageFirstFotogram(mCursor.getString(COLUMN_TRAILER_KEY))).
+                into(viewHolder.iv_trailer);
+        viewHolder.tv_movie_trailer_title.setText(mCursor.getString(TrailerFragment.COLUMN_TRAILER_NAME));
+    }
+
+    @Override
+    public int getItemCount() {
+        if ( null != mCursor)
+            return mCursor.getCount();
+        return 0;
+    }
+
+    public void swapCursor(Cursor cursor) {
+        if (cursor != null) {
+            mCursor = cursor;
+            notifyDataSetChanged();
+        }
+    }
+
+    public Cursor getCursor() {
+        return mCursor;
+    }
+
 }
