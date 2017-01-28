@@ -9,6 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -55,6 +57,21 @@ public class MovieDetailFragment extends Fragment implements
     public static final int COLUMN_MOVIE_OVERVIEW = 5;
     public static final int COLUMN_MOVIE_FAVORITE = 6;
 
+    /**
+     * The ID for the TRAILER LOADER
+     */
+    private static final int TRAILER_LOADER = 1;
+
+    private static final String[] TRAILER_COLUMNS = {
+            MovieContract.TrailerEntry.TABLE_NAME + "." + MovieContract.TrailerEntry._ID,
+            MovieContract.TrailerEntry.COLUMN_TRAILER_ID,
+            MovieContract.TrailerEntry.COLUMN_TRAILER_KEY,
+            MovieContract.TrailerEntry.COLUMN_TRAILER_NAME,
+            MovieContract.TrailerEntry.COLUMN_TRAILER_MOVIE_ID
+    };
+    public static final int COLUMN_TRAILER_KEY = 2;
+    public static final int COLUMN_TRAILER_NAME = 3;
+
     //The GUI elements
     private TextView mTitleTextView;
     private TextView mReleaseDateTextView;
@@ -67,6 +84,12 @@ public class MovieDetailFragment extends Fragment implements
      * The URI for the movie.
      */
     private Uri mUri;
+
+    /**
+     * The movies array adapter
+     */
+    private TrailerAdapter mTrailerAdapter;
+
 
     public MovieDetailFragment() {
     }
@@ -96,10 +119,18 @@ public class MovieDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mTrailerAdapter = new TrailerAdapter(getActivity());
         //Inflate
         View rootView = inflater.inflate(R.layout.fragment_movie_deatil, container, false);
         //Read the URI for the movie.
         mUri = getActivity().getIntent().getData();
+
+        RecyclerView listView = (RecyclerView)rootView.findViewById(R.id.listview_trailers);
+        listView.setHasFixedSize(true);
+        LinearLayoutManager layout = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        listView.setLayoutManager(layout);
+        listView.setAdapter(mTrailerAdapter);
+
         //Create the UI elements
         mTitleTextView = (TextView)rootView.findViewById(R.id.movie_title_textview);
         mReleaseDateTextView = (TextView)rootView.findViewById(R.id.movie_releasedate_textview);
@@ -140,39 +171,71 @@ public class MovieDetailFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        getLoaderManager().initLoader(TRAILER_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
-            return new CursorLoader(
-                    getActivity(),
-                    mUri,
-                    DETAIL_COLUMNS,
-                    null,
-                    null,
-                    null
-            );
+            switch (id) {
+                case DETAIL_LOADER: {
+                    return new CursorLoader(
+                            getActivity(),
+                            mUri,
+                            DETAIL_COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
+                case TRAILER_LOADER: {
+                    String movieId = MovieContract.MovieEntry.getMovieIdFromUri(mUri);
+                    Uri uri = MovieContract.TrailerEntry.buildTrailerUri(Integer.parseInt(movieId));
+                    return new CursorLoader(
+                            getActivity(),
+                            uri,
+                            TRAILER_COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
+            }
         }
         return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null && data.moveToFirst()) {
-            mTitleTextView.setText(data.getString(COLUMN_MOVIE_TITLE));
-            mReleaseDateTextView.setText(Utility.extractYear(data.getString(COLUMN_MOVIE_RELEASE_DATE)));
-            mRatingTextView.setText(Utility.appendRating(data.getString(COLUMN_MOVIE_VOTE_AVERAGE)));
-            mOverViewTextView.setText(data.getString(COLUMN_MOVIE_OVERVIEW));
-            Picasso.with(getContext()).load(data.getString(COLUMN_MOVIE_BACKDROP_PATH)).into(mImageView);
-            mIsFavorite = data.getString(COLUMN_MOVIE_FAVORITE) == null ? false: true;
-            updateFavouriteButton();
+        switch (loader.getId()) {
+            case DETAIL_LOADER: {
+                if (data != null && data.moveToFirst()) {
+                    mTitleTextView.setText(data.getString(COLUMN_MOVIE_TITLE));
+                    mReleaseDateTextView.setText(Utility.extractYear(data.getString(COLUMN_MOVIE_RELEASE_DATE)));
+                    mRatingTextView.setText(Utility.appendRating(data.getString(COLUMN_MOVIE_VOTE_AVERAGE)));
+                    mOverViewTextView.setText(data.getString(COLUMN_MOVIE_OVERVIEW));
+                    Picasso.with(getContext()).load(data.getString(COLUMN_MOVIE_BACKDROP_PATH)).into(mImageView);
+                    mIsFavorite = data.getString(COLUMN_MOVIE_FAVORITE) == null ? false: true;
+                    updateFavouriteButton();
+                }
+            }
+            case TRAILER_LOADER: {
+                mTrailerAdapter.swapCursor(data);
+            }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        switch (loader.getId()) {
+            case DETAIL_LOADER: {
+
+            }
+            case TRAILER_LOADER: {
+                mTrailerAdapter.swapCursor(null);
+            }
+        }
     }
 
     private void updateFavouriteButton() {

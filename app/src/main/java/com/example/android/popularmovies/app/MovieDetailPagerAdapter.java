@@ -14,8 +14,7 @@ public class MovieDetailPagerAdapter  extends FragmentPagerAdapter {
     private Context mContext;
 
     private static final int OVERVIEW = 0;
-    private static final int TRAILER = 1;
-    private static final int REVIEW = 2;
+    private static final int REVIEW = 1;
 
     public MovieDetailPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
@@ -28,8 +27,6 @@ public class MovieDetailPagerAdapter  extends FragmentPagerAdapter {
         switch (position) {
             case OVERVIEW:
                     return new MovieDetailFragment();
-            case TRAILER:
-                return new TrailerFragment();
             case REVIEW:
                 return new ReviewFragment();
             default:
@@ -40,7 +37,7 @@ public class MovieDetailPagerAdapter  extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         //TODO If the movie has not got trailer or reviews, change this number.
-        return 3;
+        return 2;
     }
 
     @Override
@@ -48,8 +45,6 @@ public class MovieDetailPagerAdapter  extends FragmentPagerAdapter {
         switch (position) {
             case OVERVIEW:
                 return mContext.getResources().getString(R.string.title_tab_overview);
-            case TRAILER:
-                return mContext.getResources().getString(R.string.title_tab_trailer);
             case REVIEW:
                 return mContext.getResources().getString(R.string.title_tab_review);
         }
