@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import static com.example.android.popularmovies.app.R.layout.list_item_trailer;
-import static com.example.android.popularmovies.app.TrailerFragment.COLUMN_TRAILER_KEY;
 import static com.example.android.popularmovies.app.Utility.buildImageFirstFotogram;
 
 /**
@@ -59,9 +58,9 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         mCursor.moveToPosition(position);
 
         Picasso.with(mContext).
-                load(buildImageFirstFotogram(mCursor.getString(COLUMN_TRAILER_KEY))).
+                load(buildImageFirstFotogram(mCursor.getString(MovieDetailFragment.COLUMN_TRAILER_KEY))).
                 into(viewHolder.iv_trailer);
-        viewHolder.tv_movie_trailer_title.setText(mCursor.getString(TrailerFragment.COLUMN_TRAILER_NAME));
+        viewHolder.tv_movie_trailer_title.setText(mCursor.getString(MovieDetailFragment.COLUMN_TRAILER_NAME));
     }
 
     @Override
