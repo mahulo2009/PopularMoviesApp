@@ -7,11 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.example.android.popularmovies.app.data.MovieContract;
 
@@ -56,24 +56,18 @@ public class ReviewFragment extends Fragment  implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //Creates the array update, empty.
-        mReviewAdapter = new ReviewAdapter(getActivity(), null,0);
+        mReviewAdapter = new ReviewAdapter(getActivity());
         //Inflate the fragment.
         View rootView = inflater.inflate(R.layout.fragment_movie_review, container, false);
         //Read the URI for the movie.
         mUri = getActivity().getIntent().getData();
         //Create a list view to present the list of movies
-        ListView listView = (ListView)rootView.findViewById(R.id.listview_reviews);
+        RecyclerView listView = (RecyclerView)rootView.findViewById(R.id.listview_reviews);
+        listView.setHasFixedSize(true);
+        LinearLayoutManager layout = new LinearLayoutManager(getContext());
+        listView.setLayoutManager(layout);
         listView.setAdapter(mReviewAdapter);
-        //If the user tap a movie entry, a detail view is showed
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if (cursor != null) {
-                    //TODO GO TO WEB PAGE.
-                }
-            }
-        });
+
         return rootView;
     }
 
