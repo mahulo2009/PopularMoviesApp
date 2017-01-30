@@ -33,13 +33,15 @@ public class MovieDetailFragment extends Fragment implements
         FetchTrailerTask.Callback , LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
+
+    public static final String DETAIL_URI_KEY = "DETAIL_URI_KEY";
+
+    private boolean mIsFavorite;
+
     /**
      * The ID for the DETAIL LOADER
      */
     private static final int DETAIL_LOADER = 0;
-
-    private boolean mIsFavorite;
-
     private static final String[] DETAIL_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
@@ -61,7 +63,6 @@ public class MovieDetailFragment extends Fragment implements
      * The ID for the TRAILER LOADER
      */
     private static final int TRAILER_LOADER = 1;
-
     private static final String[] TRAILER_COLUMNS = {
             MovieContract.TrailerEntry.TABLE_NAME + "." + MovieContract.TrailerEntry._ID,
             MovieContract.TrailerEntry.COLUMN_TRAILER_ID,
@@ -71,6 +72,21 @@ public class MovieDetailFragment extends Fragment implements
     };
     public static final int COLUMN_TRAILER_KEY = 2;
     public static final int COLUMN_TRAILER_NAME = 3;
+
+    /**
+     * The ID for the REVIEW LOADER
+     */
+    private static final int REVIEW_LOADER = 2;
+    private static final String[] REVIEW_COLUMNS = {
+            MovieContract.ReviewEntry.TABLE_NAME + "." + MovieContract.ReviewEntry._ID,
+            MovieContract.ReviewEntry.COLUMN_REVIEW_ID,
+            MovieContract.ReviewEntry.COLUMN_REVIEW_AUTHOR,
+            MovieContract.ReviewEntry.COLUMN_REVIEW_CONTENT,
+            MovieContract.ReviewEntry.COLUMN_REVIEW_URL
+    };
+    public static final int COLUMN_REVIEW_AUTHOR = 2;
+    public static final int COLUMN_REVIEW_CONTENT = 3;
+    public static final int COLUMN_REVIEW_URL = 4;
 
     //The GUI elements
     private TextView mTitleTextView;
@@ -84,14 +100,17 @@ public class MovieDetailFragment extends Fragment implements
      * The URI for the movie.
      */
     private Uri mUri;
-
     /**
      * The movies array adapter
      */
     private TrailerAdapter mTrailerAdapter;
-
+    /**
+     * The movies array adapter
+     */
+    private ReviewAdapter mReviewAdapter;
 
     public MovieDetailFragment() {
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -119,17 +138,30 @@ public class MovieDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mTrailerAdapter = new TrailerAdapter(getActivity());
-        //Inflate
-        View rootView = inflater.inflate(R.layout.fragment_movie_deatil, container, false);
-        //Read the URI for the movie.
-        mUri = getActivity().getIntent().getData();
 
+        //Adapter for the trailers
+        mTrailerAdapter = new TrailerAdapter(getActivity());
+        //Adapter for the reviews
+        mReviewAdapter = new ReviewAdapter(getActivity());
+        //Inflate
+        View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        //Get the URI from the arguments
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI_KEY);
+        }
+        //Recycler view for the Trailers
         RecyclerView listView = (RecyclerView)rootView.findViewById(R.id.listview_trailers);
         listView.setHasFixedSize(true);
         LinearLayoutManager layout = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
         listView.setLayoutManager(layout);
         listView.setAdapter(mTrailerAdapter);
+        //Recycler view for the reviews
+        RecyclerView listView1 = (RecyclerView)rootView.findViewById(R.id.listview_reviews);
+        listView1.setHasFixedSize(true);
+        LinearLayoutManager layout1 = new LinearLayoutManager(getContext());
+        listView1.setLayoutManager(layout1);
+        listView1.setAdapter(mReviewAdapter);
 
         //Create the UI elements
         mTitleTextView = (TextView)rootView.findViewById(R.id.movie_title_textview);
@@ -172,6 +204,7 @@ public class MovieDetailFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         getLoaderManager().initLoader(TRAILER_LOADER, null, this);
+        getLoaderManager().initLoader(REVIEW_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -201,6 +234,19 @@ public class MovieDetailFragment extends Fragment implements
                             null
                     );
                 }
+                case REVIEW_LOADER: {
+                    String movieId = MovieContract.MovieEntry.getMovieIdFromUri(mUri);
+                    Uri uri = MovieContract.ReviewEntry.buildReviewUri(Integer.parseInt(movieId));
+
+                    return new CursorLoader(
+                            getActivity(),
+                            uri,
+                            REVIEW_COLUMNS,
+                            null,
+                            null,
+                            null
+                    );
+                }
             }
         }
         return null;
@@ -219,9 +265,15 @@ public class MovieDetailFragment extends Fragment implements
                     mIsFavorite = data.getString(COLUMN_MOVIE_FAVORITE) == null ? false: true;
                     updateFavouriteButton();
                 }
+                break;
             }
             case TRAILER_LOADER: {
                 mTrailerAdapter.swapCursor(data);
+                break;
+            }
+            case REVIEW_LOADER: {
+                mReviewAdapter.swapCursor(data);
+                break;
             }
         }
     }
@@ -234,6 +286,9 @@ public class MovieDetailFragment extends Fragment implements
             }
             case TRAILER_LOADER: {
                 mTrailerAdapter.swapCursor(null);
+            }
+            case REVIEW_LOADER: {
+                mReviewAdapter.swapCursor(null);
             }
         }
     }

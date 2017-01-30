@@ -3,16 +3,20 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-
     <dimen name="movie_title_height">100dp</dimen>
     <dimen name="movie_title_text_size">30sp</dimen>
+    <dimen name="movie_image_grid_width">200dp</dimen>
     <dimen name="movie_image_width">179dp</dimen>
     <dimen name="movie_image_height">270dp</dimen>
+    <dimen name="movie_image_title_text_size">38sp</dimen>
+    <dimen name="movie_release_date_text_size">36sp</dimen>
+    <dimen name="movie_rating_text_size">22sp</dimen>
+    <dimen name="movie_overview_text_size">22sp</dimen>
+    <dimen name="movie_review_title_text_size">26sp</dimen>
+    <dimen name="movie_review_content_text_size">22sp</dimen>
+    <dimen name="movie_relesedate_padding">20dp</dimen>
     <dimen name="movie_image_padding">10dp</dimen>
-    <dimen name="movie_relesedate_padding">5dp</dimen>
-    <dimen name="movie_release_date_text_size">40sp</dimen>
     <dimen name="movie_rating_padding">5dp</dimen>
-    <dimen name="movie_rating_text_size">25sp</dimen>
     <dimen name="movie_overview_padding">10dp</dimen>
-    <dimen name="movie_overview_text_size">20sp</dimen>
+
 </resources>

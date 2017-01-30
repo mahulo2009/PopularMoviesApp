@@ -19,7 +19,7 @@ import static com.example.android.popularmovies.app.ReviewFragment.COLUMN_REVIEW
 
 public class ReviewAdapter  extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterHolder>  {
     //TODO The number of words depending on layout
-    private static int FIRST_N_WORDS = 5000;
+    private static int FIRST_N_WORDS = 50;
 
     private Cursor mCursor;
     private Context mContext;

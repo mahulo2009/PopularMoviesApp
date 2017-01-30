@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="185dp"
+    android:layout_width="@dimen/movie_image_grid_width"
     android:layout_height="wrap_content">
 
     <ImageView xmlns:android="http://schemas.android.com/apk/res/android"

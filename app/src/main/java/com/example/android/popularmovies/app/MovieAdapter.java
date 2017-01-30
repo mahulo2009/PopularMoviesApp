@@ -1,7 +1,6 @@
 package com.example.android.popularmovies.app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -50,11 +49,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                     int position = getAdapterPosition();
                     if (RecyclerView.NO_POSITION != position ) {
                         mCursor.moveToPosition(position);
-
+                        //Build the URI and make the callback
                         Uri uri = MovieContract.MovieEntry.buildMovieUriAPIId(mCursor.getString(COLUMN_MOVIE_ID));
-                        Intent detailIntent =
-                                new Intent(mContext, MovieDeatilActivity.class).setData(uri);
-                        mContext.startActivity(detailIntent);
+                        ((Callback) mContext).onItemSelected(uri);
                     }
                 }
             });
@@ -94,6 +91,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     public Cursor getCursor() {
         return mCursor;
+    }
+
+    public interface Callback {
+        void onItemSelected(Uri dateUri);
     }
 
 }
