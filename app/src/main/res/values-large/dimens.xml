@@ -7,10 +7,12 @@
     <dimen name="movie_title_text_size">30sp</dimen>
     <dimen name="movie_image_grid_width">200dp</dimen>
     <dimen name="movie_image_width">179dp</dimen>
+    <dimen name="movie_image_trailer_width">140dp</dimen>
     <dimen name="movie_image_height">270dp</dimen>
     <dimen name="movie_image_title_text_size">38sp</dimen>
     <dimen name="movie_release_date_text_size">36sp</dimen>
     <dimen name="movie_rating_text_size">22sp</dimen>
+    <dimen name="movie_overview_title_text_size">25sp</dimen>
     <dimen name="movie_overview_text_size">22sp</dimen>
     <dimen name="movie_review_title_text_size">26sp</dimen>
     <dimen name="movie_review_content_text_size">22sp</dimen>

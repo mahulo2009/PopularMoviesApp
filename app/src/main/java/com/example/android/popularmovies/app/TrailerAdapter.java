@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -29,14 +28,11 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     public class TrailerViewHolder  extends RecyclerView.ViewHolder {
 
-        public TextView tv_movie_trailer_title;
         public ImageView iv_trailer;
 
         public TrailerViewHolder(View view) {
             super(view);
             iv_trailer = (ImageView)view.findViewById(R.id.trailer_imageview);
-            tv_movie_trailer_title = (TextView)view.findViewById(R.id.movie_trailer_title_textview);
-
             iv_trailer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -60,7 +56,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         Picasso.with(mContext).
                 load(buildImageFirstFotogram(mCursor.getString(MovieDetailFragment.COLUMN_TRAILER_KEY))).
                 into(viewHolder.iv_trailer);
-        viewHolder.tv_movie_trailer_title.setText(mCursor.getString(MovieDetailFragment.COLUMN_TRAILER_NAME));
     }
 
     @Override
