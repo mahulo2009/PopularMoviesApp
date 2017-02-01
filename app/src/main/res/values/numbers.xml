@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="grid_view_num_columns" type="integer">2</item>
+    <item name="trailer_review_max_lines" type="integer">5</item>
 </resources>

@@ -45,15 +45,6 @@ public class Utility {
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
-
-    public static String getFirstNStrings(String str, int n) {
-        String[] sArr = str.split(" ");
-        String firstStrs = "";
-        for(int i = 0; (i < n) && (i<sArr.length); i++)
-            firstStrs += sArr[i] + " ";
-        return firstStrs.trim();
-    }
-
     public static Spanned buildUrlReadMore(String str) {
         //TODO String in other file
         String result = "<html><a href="+str+">Read More...</a></html>";

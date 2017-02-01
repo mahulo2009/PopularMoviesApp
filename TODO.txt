@@ -3,6 +3,7 @@
 3. Movie Detail Activity create cards for different sections: overview, trailer, reviews.
 4. Movie Detail Activity create a card for summarize information of the film.
 5. Movie Detail Activity use coordinate layout for poster and favorite button...
+6. Include the Sync Manager
 
 
 

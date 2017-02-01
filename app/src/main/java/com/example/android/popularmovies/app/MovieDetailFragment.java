@@ -158,7 +158,6 @@ public class MovieDetailFragment extends Fragment implements
         listView.setAdapter(mTrailerAdapter);
         //Recycler view for the reviews
         RecyclerView listView1 = (RecyclerView)rootView.findViewById(R.id.listview_reviews);
-        listView1.setHasFixedSize(true);
         LinearLayoutManager layout1 = new LinearLayoutManager(getContext());
         listView1.setLayoutManager(layout1);
         listView1.setAdapter(mReviewAdapter);
