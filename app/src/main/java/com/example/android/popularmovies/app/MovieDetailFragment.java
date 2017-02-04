@@ -345,27 +345,3 @@ public class MovieDetailFragment extends Fragment implements
     }
 
 }
-
-
-/**
-
- //TODO Move to a CursorAdapter
- private void buildTrailerCard(Cursor cursor,LinearLayout layout) {
- int padding = Utility.dpToPx(getContext(),5);
- ImageView iv_trailer = new ImageView(getContext());
- iv_trailer.setTag(cursor.getString(COLUMN_TRAILER_KEY));
- iv_trailer.setPadding(padding ,padding ,padding ,padding );
- iv_trailer.setOnClickListener(new View.OnClickListener() {
-@Override
-public void onClick(View v) {
-String key = (String) v.getTag();
-Intent webIntent = new Intent(Intent.ACTION_VIEW,
-buildUriTrailer(key));
-webIntent.putExtra("force_fullscreen",true);
-getContext().startActivity(webIntent);
-}
-});
- Picasso.with(getContext()).load(buildImageFirstFotogram(cursor.getString(COLUMN_TRAILER_KEY))).into(iv_trailer);
- layout.addView(iv_trailer);
- }
- */

@@ -1,6 +1,7 @@
 package com.example.android.popularmovies.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,7 +37,15 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
             iv_trailer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO
+                    int position = getAdapterPosition();
+                    if (RecyclerView.NO_POSITION != position ) {
+                        mCursor.moveToPosition(position);
+                        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                                Utility.buildUriTrailer(mCursor.
+                                        getString(MovieDetailFragment.COLUMN_TRAILER_KEY)));
+                        webIntent.putExtra("force_fullscreen", true);
+                        mContext.startActivity(webIntent);
+                    }
                 }
             });
         }
