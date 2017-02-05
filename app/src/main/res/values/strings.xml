@@ -13,5 +13,6 @@
 
     <string name="title_tab_overview">OVERVIEW</string>
     <string name="title_tab_review">REVIEWS</string>
+    <string name="sync_account_type">popularmovie.example.com</string>
 
 </resources>

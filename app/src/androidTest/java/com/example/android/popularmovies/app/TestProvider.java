@@ -150,11 +150,33 @@ public class TestProvider {
         // content://com.example.android.popularmovies.app/movie/1
         type = mContext.getContentResolver().getType(
                 buildMovieUriAPIId(testMovieID));
-        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        // vnd.android.cursor.item/com.example.android.popularmovies.app/movie
         assertEquals("Error: the MovieEntry CONTENT_URI with id should return MovieEntry.CONTENT_TYPE",
                 MovieContract.MovieEntry.CONTENT_ITEM_TYPE, type);
 
-        //TODO ADD Review and Trail
+        // content://com.example.android.popularmovies.app/trailer
+        type = mContext.getContentResolver().getType(MovieContract.TrailerEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.popularmovies.app/trailer
+        assertEquals("Error: the TrailerEntry CONTENT_URI with id should return TrailerEntry.CONTENT_TYPE",
+                MovieContract.TrailerEntry.CONTENT_TYPE, type);
+
+        // content://com.example.android.popularmovies.app/trailer/1
+        type = mContext.getContentResolver().getType(MovieContract.TrailerEntry.buildTrailerUri(Integer.parseInt(testMovieID)));
+        // vnd.android.cursor.item/com.example.android.popularmovies.app/trailer
+        assertEquals("Error: the TrailerEntry CONTENT_URI with id should return TrailerEntry.CONTENT_TYPE",
+                MovieContract.TrailerEntry.CONTENT_ITEM_TYPE, type);
+
+        // content://com.example.android.popularmovies.app/review
+        type = mContext.getContentResolver().getType(MovieContract.ReviewEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.popularmovies.app/review
+        assertEquals("Error: the ReviewEntry CONTENT_URI with id should return ReviewEntry.CONTENT_TYPE",
+                MovieContract.ReviewEntry.CONTENT_TYPE, type);
+
+        // content://com.example.android.popularmovies.app/review/1
+        type = mContext.getContentResolver().getType(MovieContract.ReviewEntry.buildReviewUri(Integer.parseInt(testMovieID)));
+        // vnd.android.cursor.item/com.example.android.popularmovies.app/review
+        assertEquals("Error: the ReviewEntry CONTENT_URI with id should return ReviewEntry.CONTENT_TYPE",
+                MovieContract.ReviewEntry.CONTENT_ITEM_TYPE, type);
 
         // content://com.example.android.popularmovies.app/movie_favorite/
         type = mContext.getContentResolver().getType(MovieContract.MovieFavoriteEntry.CONTENT_URI);
@@ -166,7 +188,7 @@ public class TestProvider {
         // content://com.example.android.popularmovies.app/movie_favorite/1
         type = mContext.getContentResolver().getType(
                 MovieContract.MovieFavoriteEntry.buildMovieFavoriteUri(1));
-        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        // vnd.android.cursor.item/com.example.android.popularmovies.app/movie_favorite
         assertEquals("Error: the MovieFavoriteEntry CONTENT_URI with id should return MovieFavoriteEntry.CONTENT_TYPE",
                 MovieContract.MovieFavoriteEntry.CONTENT_ITEM_TYPE, type);
 
@@ -367,7 +389,21 @@ public class TestProvider {
 
     @Test
     public void testMovieFavoriteQuery() {
-        //TODO.
+        Context mContext = InstrumentationRegistry.getTargetContext();
+        SQLiteDatabase db = new MovieDbHelper(mContext).getWritableDatabase();
+
+        ContentValues movieFavoriteValues = TestUtilities.createMovieFavoriteValues(1);
+        long movieRowId = db.insert(MovieContract.MovieFavoriteEntry.TABLE_NAME, null, movieFavoriteValues);
+
+        // Test the basic content provider query
+        Cursor c = mContext.getContentResolver().query(
+                MovieContract.MovieFavoriteEntry.buildMovieFavoriteUri(movieRowId),
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testBasicMovieQuery", c, movieFavoriteValues);
     }
 
     @Test

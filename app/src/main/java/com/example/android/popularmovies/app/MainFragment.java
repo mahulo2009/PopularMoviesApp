@@ -9,14 +9,11 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.android.popularmovies.app.data.Movie;
 import com.example.android.popularmovies.app.data.MovieContract;
@@ -76,20 +73,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        int id = item.getItemId();
-        if (id == R.id.action_refresh)
-        {
-            //When the refresh menu item is pressed we make a query, on the background
-            //to the movie API and update the Array adapter.
-            updateMovies();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         //Create the Loader in the background.
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
@@ -99,8 +82,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onStart() {
         super.onStart();
-        //TODO Find out the good way to notify the data change.
-        //For example, if the user select a movie as favorite.
         getLoaderManager().restartLoader(MOVIE_LOADER,null,this);
     }
 
@@ -121,24 +102,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         gridView.setAdapter(mMovieAdapter);
 
         return rootView;
-    }
-
-    /**
-     * Fetch the movie data from API movie service.
-     */
-    //TODO This method will became obsoleto when the sync manger used.
-    public void updateMovies() {
-        if (Utility.isOnline(getActivity())) {
-            //If the order by is not Favourite, request to internet.
-            if (!mOrderBy.equals(Movie.FAVOURITE_MOVIE)) {
-                //If there is internet connection make the API request in the background.
-                FetchMoviesTask fetchMoviesTask = new FetchMoviesTask(getContext());
-                fetchMoviesTask.execute(mOrderBy);
-            }
-        } else  {
-            Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
-            Log.d(LOG_TAG,"NOT internet connectivity for the moment");
-        }
     }
 
     @Override

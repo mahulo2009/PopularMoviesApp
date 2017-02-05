@@ -218,11 +218,11 @@ public class MovieProvider extends ContentProvider {
             case TRAILER:
                 return MovieContract.TrailerEntry.CONTENT_TYPE;
             case TRAILER_MOVIE_ID:
-                return MovieContract.TrailerEntry.CONTENT_TYPE;
+                return MovieContract.TrailerEntry.CONTENT_ITEM_TYPE;
             case REVIEW:
                 return MovieContract.ReviewEntry.CONTENT_TYPE;
             case REVIEW_MOVIE_ID:
-                return MovieContract.ReviewEntry.CONTENT_TYPE;
+                return MovieContract.ReviewEntry.CONTENT_ITEM_TYPE;
             case MOVIE_FAVORITE:
                 return MovieContract.MovieFavoriteEntry.CONTENT_TYPE;
             case MOVIE_FAVORITE_WITH_ID:
@@ -318,7 +318,6 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        //TODO
         return 0;
     }
 
@@ -377,9 +376,6 @@ public class MovieProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
-            }
-            case MOVIE_FAVORITE: {
-                //TODO
             }
 
             default:

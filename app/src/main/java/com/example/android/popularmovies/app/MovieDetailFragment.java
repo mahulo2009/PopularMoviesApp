@@ -208,6 +208,12 @@ public class MovieDetailFragment extends Fragment implements
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        updateTrailers();
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if ( null != mUri ) {
             switch (id) {
@@ -300,10 +306,22 @@ public class MovieDetailFragment extends Fragment implements
         }
     }
 
+    private void updateTrailers() {
+        if ( null != mUri ) {
+            String movieId = MovieContract.MovieEntry.getMovieIdFromUri(mUri);
+            if (Utility.isOnline(getActivity())) {
+                FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext(), getView().getRootView(), this);
+                fetchTrailerTask.execute(movieId);
+            } else {
+                Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "NOT internet connectivity for the moment");
+            }
+        }
+    }
+
     @Override
-    public void onStart() {
-        super.onStart();
-        updateTrailers();
+    public void onTrailerInserted() {
+        updateReviews();
     }
 
     /**
@@ -322,26 +340,6 @@ public class MovieDetailFragment extends Fragment implements
                 Log.d(LOG_TAG, "NOT internet connectivity for the moment");
             }
         }
-    }
-
-    private void updateTrailers() {
-        if ( null != mUri ) {
-            String movieId = MovieContract.MovieEntry.getMovieIdFromUri(mUri);
-            if (Utility.isOnline(getActivity())) {
-                FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext(), getView().getRootView(), this);
-                fetchTrailerTask.execute(movieId);
-            } else {
-                Toast.makeText(getActivity(), "Check your connection and try again", Toast.LENGTH_SHORT).show();
-                Log.d(LOG_TAG, "NOT internet connectivity for the moment");
-            }
-        }
-    }
-
-    @Override
-    public void onTrailerInserted() {
-        updateReviews();
-        //TODO See how to reset loaders.
-        //getLoaderManager().restartLoader(REVIEW_LOADER,null,this);
     }
 
 }
