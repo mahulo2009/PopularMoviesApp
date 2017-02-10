@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.popularmovies.app.data.Movie;
 import com.example.android.popularmovies.app.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
@@ -49,7 +50,9 @@ public class MovieDetailFragment extends Fragment implements
             MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE,
             MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW,
-            MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieFavoriteEntry.COLUMN_FAVORITE_MOVIE_ID,
+
     };
     public static final int COL_MOVIE_ID = 0;
     public static final int COLUMN_MOVIE_TITLE = 1;
@@ -57,7 +60,10 @@ public class MovieDetailFragment extends Fragment implements
     public static final int COLUMN_MOVIE_RELEASE_DATE = 3;
     public static final int COLUMN_MOVIE_VOTE_AVERAGE = 4;
     public static final int COLUMN_MOVIE_OVERVIEW = 5;
-    public static final int COLUMN_MOVIE_FAVORITE = 6;
+    public static final int COL_MOVIE_API_ID = 6;
+    public static final int COLUMN_MOVIE_FAVORITE = 7;
+
+
 
     /**
      * The ID for the TRAILER LOADER
@@ -149,6 +155,20 @@ public class MovieDetailFragment extends Fragment implements
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI_KEY);
+        } else {
+            //If the mUri is null, we query the first movie with the popular criteria
+            //to update in the case of master/detail view the view.
+            String sMovieSelection =
+                    MovieContract.MovieEntry.TABLE_NAME+
+                            "." + MovieContract.MovieEntry.COLUMN_MOVIE_CRITERIA + " = ? ";
+            Cursor c =  getContext().getContentResolver().query(
+                    MovieContract.MovieEntry.CONTENT_URI,DETAIL_COLUMNS,
+                    sMovieSelection,
+                    new String[]{Movie.POPULAR_MOVIE},
+                    null);
+            c.moveToFirst();
+            if (c != null)
+                mUri = MovieContract.MovieEntry.buildMovieUriAPIId(c.getString(COL_MOVIE_API_ID));
         }
         //Recycler view for the Trailers
         RecyclerView listView = (RecyclerView)rootView.findViewById(R.id.listview_trailers);

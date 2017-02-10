@@ -80,12 +80,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        getLoaderManager().restartLoader(MOVIE_LOADER,null,this);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //Creates the array update, empty.
