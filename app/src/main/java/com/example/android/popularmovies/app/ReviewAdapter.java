@@ -55,7 +55,7 @@ public class ReviewAdapter  extends RecyclerView.Adapter<ReviewAdapter.ReviewAda
             ib_readmore_down.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    tv_content.setMaxLines(mContext.getResources().getInteger(R.integer.trailer_review_max_lines));
+                    tv_content.setMaxLines(mContext.getResources().getInteger(R.integer.review_max_lines));
                     ib_readmore_up.setVisibility(View.VISIBLE);
                     ib_readmore_down.setVisibility(View.INVISIBLE);
                 }

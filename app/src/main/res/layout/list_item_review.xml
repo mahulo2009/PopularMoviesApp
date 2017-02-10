@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/movie_review_content_text_size"
             android:padding="5dp"
-            android:maxLines="@integer/trailer_review_max_lines"
+            android:maxLines="@integer/review_max_lines"
             android:fontFamily="sans-serif-condensed"
             android:id="@+id/review_content_textview" />
 

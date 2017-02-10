@@ -91,7 +91,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         //Create a list view to present the list of movies
         RecyclerView gridView = (RecyclerView)rootView.findViewById(R.id.gridview_movies);
         gridView.setHasFixedSize(true);
-        GridLayoutManager layout = new GridLayoutManager(getContext(),2);
+        GridLayoutManager layout = new GridLayoutManager(getContext(),getResources().getInteger(R.integer.grid_view_num_columns));
         gridView.setLayoutManager(layout);
         gridView.setAdapter(mMovieAdapter);
 
